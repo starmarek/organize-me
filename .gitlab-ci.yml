@@ -1,0 +1,36 @@
+image: python:3.6-slim-buster
+
+stages:
+  - build
+  - test
+  - cleanup
+
+variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    WORKON_HOME: "$CI_PROJECT_DIR/venv"
+
+default:
+  before_script:
+    - pip install pipenv
+
+build:
+  stage: build
+  inherit:
+    default: true
+  before_script:
+    - pip install pipenv
+    - apt update
+    - apt install libpq-dev -y
+  script:
+    - env VIRTUALENV_COPIES=1 pipenv install --ignore-pipfile --dev
+  artifacts:
+    paths:
+      - .cache/pip
+      - venv/
+
+test_pytest:
+  stage: test
+  inherit:
+    default: true
+  script:
+    - pipenv run pytest
