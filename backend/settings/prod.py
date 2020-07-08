@@ -22,5 +22,7 @@ DEBUG = bool(os.getenv('DJANGO_DEBUG', ''))
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', SECRET_KEY)
 
-# Set to your Domain here (eg. 'django-vue-template-demo.herokuapp.com')
-ALLOWED_HOSTS = os.getenv('DJANGO_APP_URL', '*')
+# The '*' is an official Heroku config. Refer to:
+# https://devcenter.heroku.com/articles/django-app-configuration
+# https://github.com/heroku/django-heroku
+ALLOWED_HOSTS = ['*']
