@@ -5,9 +5,10 @@ db.sqlite3
 /venv
 __pycache__
 
-# local env files
+# env files
 .env.local
 .env.*.local
+.env
 
 # Log files
 npm-debug.log*
