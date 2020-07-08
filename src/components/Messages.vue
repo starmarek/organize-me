@@ -8,10 +8,10 @@
     <p>Message</p>
     <input type="text" placeholder="From the other side" v-model="msgBody">
     <br><br>
-    <input 
-      type="submit" 
-      value="Add" 
-      @click="addMessage({ subject: subject, body: msgBody })" 
+    <input
+      type="submit"
+      value="Add"
+      @click="addMessage({ subject: subject, body: msgBody })"
       :disabled="!subject || !msgBody">
 
     <hr/>
@@ -27,25 +27,22 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "Messages",
   data() {
     return {
       subject: "",
-      msgBody: "",
+      msgBody: ""
     };
   },
   computed: mapState({
     messages: state => state.messages.messages
   }),
-  methods: mapActions('messages', [
-    'addMessage',
-    'deleteMessage'
-  ]),
+  methods: mapActions("messages", ["addMessage", "deleteMessage"]),
   created() {
-    this.$store.dispatch('messages/getMessages')
+    this.$store.dispatch("messages/getMessages");
   }
 };
 </script>
@@ -75,5 +72,4 @@ img {
   padding-top: 50px;
   padding-bottom: 50px;
 }
-
 </style>

@@ -1,0 +1,66 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+#header {
+  background-color: #a63d40;
+  padding: 30px;
+  text-align: center;
+  color: white;
+}
+
+#nav {
+  float: left;
+  width: 20%;
+  background: #c2c2c2;
+  padding: 20px;
+}
+
+#nav ul {
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+}
+
+#nav li {
+  margin-bottom: 15px;
+}
+
+#main {
+  float: left;
+  padding: 20px;
+  width: 80%;
+  background-color: #ebebeb;
+}
+
+#section:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#footer {
+  background-color: #a63d40;
+  padding: 10px;
+  text-align: center;
+  color: white;
+}
+
+/* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
+@media (max-width: 600px) {
+  #nav,
+  #main {
+    width: 100%;
+    height: auto;
+  }
+}
+
+a {
+  color: #c25b5f;
+}
