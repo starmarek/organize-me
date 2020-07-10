@@ -3,7 +3,7 @@ image: python:3.6-slim-buster
 stages:
   - build
   - test
-  - cleanup
+  - deploy
 
 variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
@@ -15,13 +15,9 @@ default:
 
 build:
   stage: build
-  inherit:
-    default: true
-  before_script:
-    - pip install pipenv
-    - apt update
-    - apt install libpq-dev -y
   script:
+    - apt update -qy
+    - apt install -y libpq-dev
     - env VIRTUALENV_COPIES=1 pipenv install --ignore-pipfile --dev
   artifacts:
     paths:
@@ -30,7 +26,19 @@ build:
 
 test_pytest:
   stage: test
-  inherit:
-    default: true
   script:
     - pipenv run pytest
+
+heroku:
+  image: ruby:latest
+  stage: deploy
+  inherit:
+    default: false
+  dependencies: []
+  script:
+    - apt update -qy
+    - apt install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=hospital-organize-me --api-key=$HEROKU_API_KEY
+  only:
+    - master
