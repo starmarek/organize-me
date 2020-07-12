@@ -1,15 +1,14 @@
-# pull official base image
 FROM python:3.6-slim-buster
 
-# set work directory
 WORKDIR /usr/src/app
 
-# set environment variables
+# flush python logs immediately; do not buffer
 ENV PYTHONUNBUFFERED 1
 
-# install dependencies
 RUN pip install --upgrade pip
 RUN pip install pipenv
+# libpq-dev is a debian-base dependency for psycopg2-binary
 RUN apt update -yq && apt install libpq-dev -y
+
 COPY Pipfile* ./
-RUN pipenv install --ignore-pipfile
+RUN pipenv sync

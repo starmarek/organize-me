@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  web:
+  backend:
     build: 
       context: .
       dockerfile: backend/Dockerfile
@@ -9,12 +9,23 @@ services:
     volumes:
       - ./backend:/usr/src/app/backend
       - ./manage.py:/usr/src/app/manage.py
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     env_file:
       - ./.env
     depends_on:
       - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    command: yarn serve
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./public:/usr/src/app/public
+    ports:
+      - 8080:8080
 
   db:
     image: postgres:12-alpine
