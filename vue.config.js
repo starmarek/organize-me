@@ -14,7 +14,7 @@ module.exports = {
       proxy: {
         '/api*': {
           // Forward frontend dev server request for /api to django dev server
-          target: 'http://backend:8000/',
+          target: 'http://django:8000/',
         }
       }
     }
