@@ -4,7 +4,7 @@ services:
   django:
     build: 
       context: .
-      dockerfile: docker/Dockerfile.django
+      dockerfile: docker/django.Dockerfile
     command: docker/django_entrypoint.sh
     volumes:
       - .:/app
@@ -18,7 +18,7 @@ services:
   vue:
     build:
       context: .
-      dockerfile: docker/Dockerfile.vue
+      dockerfile: docker/vue.Dockerfile
     command: docker/vue_entrypoint.sh
     volumes:
       - .:/app
