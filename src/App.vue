@@ -1,37 +1,84 @@
 <template>
-
-  <div id="app">
-    <div id="header">
-      <h1>Organize-me <i class="fa fa-hospital-o" aria-hidden="true"/></h1>
-      <h4>Szybkie i wygodnie ustalanie grafiku!</h4>
-    </div>
-
-    <div id="section">
-        <div id="nav">
-          <ul>
-            <li><router-link :to="{ name: 'home' }">Home</router-link></li>
-            <li><router-link :to="{ name: 'messages' }">Django Rest</router-link></li>
-          </ul>
-        </div>
-
-      <div id="main">
-        <router-view/>
-      </div>
-    </div>
-
-    <div id="footer">
-      <p>Footer</p>
+  <div class="app">
+    <Navbar/>
+    <div class="main container">
+      <router-view/>
     </div>
 
   </div>
+
 </template>
 
-<style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-}
-@import "styles/main.css";
+<script>
+import Navbar from "@/components/layout/Navbar.vue";
+export default {
+  name: "App",
+  components: {
+    Navbar,
+  },
+};
+</script>
+
+<style lang="scss">
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all";
+
+// Set your colors
+$primary: #8c67ef;
+$primary-invert: findColorInvert($primary);
+$twitter: #4099ff;
+$twitter-invert: findColorInvert($twitter);
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: (
+  "white": (
+    $white,
+    $black,
+  ),
+  "black": (
+    $black,
+    $white,
+  ),
+  "light": (
+    $light,
+    $light-invert,
+  ),
+  "dark": (
+    $dark,
+    $dark-invert,
+  ),
+  "primary": (
+    $primary,
+    $primary-invert,
+  ),
+  "info": (
+    $info,
+    $info-invert,
+  ),
+  "success": (
+    $success,
+    $success-invert,
+  ),
+  "warning": (
+    $warning,
+    $warning-invert,
+  ),
+  "danger": (
+    $danger,
+    $danger-invert,
+  ),
+  "twitter": (
+    $twitter,
+    $twitter-invert,
+  ),
+);
+
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
 </style>
