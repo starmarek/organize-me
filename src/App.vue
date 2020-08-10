@@ -1,12 +1,10 @@
 <template>
-  <div class="app">
-    <Navbar/>
+  <div class="app content">
+    <Navbar />
     <div class="main container">
-      <router-view/>
+      <router-view />
     </div>
-
   </div>
-
 </template>
 
 <script>
@@ -20,65 +18,70 @@ export default {
 </script>
 
 <style lang="scss">
-// Import Bulma's core
-@import "~bulma/sass/utilities/_all";
+  // CUSTOM
+  body {
+    height: 100vh;
+  }
 
-// Set your colors
-$primary: #8c67ef;
-$primary-invert: findColorInvert($primary);
-$twitter: #4099ff;
-$twitter-invert: findColorInvert($twitter);
+  .main {
+    padding: 20pt 10pt 20pt 10pt;
+  }
 
-// Setup $colors to use as bulma classes (e.g. 'is-twitter')
-$colors: (
-  "white": (
-    $white,
-    $black,
-  ),
-  "black": (
-    $black,
-    $white,
-  ),
-  "light": (
-    $light,
-    $light-invert,
-  ),
-  "dark": (
-    $dark,
-    $dark-invert,
-  ),
-  "primary": (
-    $primary,
-    $primary-invert,
-  ),
-  "info": (
-    $info,
-    $info-invert,
-  ),
-  "success": (
-    $success,
-    $success-invert,
-  ),
-  "warning": (
-    $warning,
-    $warning-invert,
-  ),
-  "danger": (
-    $danger,
-    $danger-invert,
-  ),
-  "twitter": (
-    $twitter,
-    $twitter-invert,
-  ),
-);
+  // BULMA
+  @import "~bulma/sass/utilities/_all";
 
-// Links
-$link: $primary;
-$link-invert: $primary-invert;
-$link-focus-border: $primary;
+  $primary: #227c9d;
+  $primary-invert: findColorInvert($primary);
+  $secondary: #ffcb77;
+  $secondary-invert: findColorInvert($secondary);
 
-// Import Bulma and Buefy styles
-@import "~bulma";
-@import "~buefy/src/scss/buefy";
+  $colors: (
+    "white": (
+      $white,
+      $black,
+    ),
+    "black": (
+      $black,
+      $white,
+    ),
+    "light": (
+      $light,
+      $light-invert,
+    ),
+    "dark": (
+      $dark,
+      $dark-invert,
+    ),
+    "primary": (
+      $primary,
+      $primary-invert,
+    ),
+    "secondary": (
+      $secondary,
+      $secondary-invert,
+    ),
+    "info": (
+      $info,
+      $info-invert,
+    ),
+    "success": (
+      $success,
+      $success-invert,
+    ),
+    "warning": (
+      $warning,
+      $warning-invert,
+    ),
+    "danger": (
+      $danger,
+      $danger-invert,
+    ),
+  );
+
+  $link: $primary;
+  $link-invert: $primary-invert;
+  $link-focus-border: $primary;
+
+  @import "~bulma";
+  @import "~buefy/src/scss/buefy";
 </style>

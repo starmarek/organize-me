@@ -1,27 +1,29 @@
 <template>
   <div class="hello">
-    <img src='@/assets/logo-django.png' style="width: 250px" />
+    <img src="@/assets/logo-django.png" style="width: 250px" />
     <p>The data below is added/removed from the SQLite Database using Django's ORM and Rest Framework.</p>
-    <br/>
+    <br />
     <p>Subject</p>
-    <input type="text" placeholder="Hello" v-model="subject">
+    <input type="text" placeholder="Hello" v-model="subject" />
     <p>Message</p>
-    <input type="text" placeholder="From the other side" v-model="msgBody">
-    <br><br>
+    <input type="text" placeholder="From the other side" v-model="msgBody" />
+    <br />
+    <br />
     <input
       type="submit"
       value="Add"
       @click="addMessage({ subject: subject, body: msgBody })"
-      :disabled="!subject || !msgBody">
+      :disabled="!subject || !msgBody"
+    />
 
-    <hr/>
+    <hr />
     <h3>Messages on Database</h3>
     <p v-if="messages.length === 0">No Messages</p>
     <div class="msg" v-for="(msg, index) in messages" :key="index">
-        <p class="msg-index">[{{index}}]</p>
-        <p class="msg-subject" v-html="msg.subject"></p>
-        <p class="msg-body" v-html="msg.body"></p>
-        <input type="submit" @click="deleteMessage(msg.pk)" value="Delete" />
+      <p class="msg-index">[{{index}}]</p>
+      <p class="msg-subject" v-html="msg.subject"></p>
+      <p class="msg-body" v-html="msg.body"></p>
+      <input type="submit" @click="deleteMessage(msg.pk)" value="Delete" />
     </div>
   </div>
 </template>
@@ -34,16 +36,16 @@ export default {
   data() {
     return {
       subject: "",
-      msgBody: ""
+      msgBody: "",
     };
   },
   computed: mapState({
-    messages: state => state.messages.messages
+    messages: (state) => state.messages.messages,
   }),
   methods: mapActions("messages", ["addMessage", "deleteMessage"]),
   created() {
     this.$store.dispatch("messages/getMessages");
-  }
+  },
 };
 </script>
 
