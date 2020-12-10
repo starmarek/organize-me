@@ -18,7 +18,7 @@ build:
   script:
     - apt update -qy
     - apt install -y libpq-dev
-    - env VIRTUALENV_COPIES=1 pipenv install --ignore-pipfile --dev
+    - env VIRTUALENV_COPIES=1 pipenv sync --dev
   artifacts:
     paths:
       - .cache/pip
@@ -28,6 +28,16 @@ test_pytest:
   stage: test
   script:
     - pipenv run pytest
+
+flake8:
+  stage: test
+  script:
+    - pipenv run flake8
+
+black:
+  stage: test
+  script:
+    - pipenv run black . --check
 
 heroku:
   image: ruby:latest
