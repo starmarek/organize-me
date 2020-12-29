@@ -2,7 +2,8 @@
   "name": "django-vue",
   "version": "0.1.0",
   "engines": {
-    "node": "15.5.0"
+    "node": "15.5.0",
+    "yarn": "2.4.0"
   },
   "private": true,
   "scripts": {
@@ -29,20 +30,5 @@
     "eslint-plugin-vue": "^7.4.0",
     "prettier": "^2.2.1",
     "vue-template-compiler": "^2.5.17"
-  },
-  "babel": {
-    "presets": [
-      "@vue/app"
-    ]
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  }
 }
