@@ -1,9 +1,8 @@
-FROM python:3.6-slim-buster
+FROM python:3.9.1-buster
 
 WORKDIR /app
 
-RUN pip install --upgrade pip
-RUN pip install pipenv
+COPY Pipfile* ./
 
-COPY . .
+RUN pip install pipenv
 RUN pipenv sync

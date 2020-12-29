@@ -16,9 +16,8 @@ services:
       - db
 
   vue:
-    build:
-      context: .
-      dockerfile: docker/vue.Dockerfile
+    image: node:15.5.0-buster
+    working_dir: /app
     command: docker/vue_entrypoint.sh
     volumes:
       - .:/app
