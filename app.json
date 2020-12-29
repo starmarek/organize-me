@@ -9,12 +9,6 @@
       "value": "backend.settings"
     }
   },
-  "engines": {
-    "yarn": "1.4.0",
-    "npm": "6.2.0",
-    "node": "15.5.0",
-    "python": "3.9.1"
-  },
   "addons": [],
   "buildpacks": [
     {
