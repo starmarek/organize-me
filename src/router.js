@@ -6,16 +6,16 @@ import Messages from "@/components/Messages";
 Vue.use(Router);
 
 export default new Router({
-  routes: [
-    {
-      path: "/",
-      name: "home",
-      component: Home
-    },
-    {
-      path: "/messages",
-      name: "messages",
-      component: Messages
-    }
-  ]
+    routes: [
+        {
+            path: "/",
+            name: "home",
+            component: Home,
+        },
+        {
+            path: "/messages",
+            name: "messages",
+            component: Messages,
+        },
+    ],
 });

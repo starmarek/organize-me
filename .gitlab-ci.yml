@@ -1,49 +1,104 @@
-image: python:3.6-slim-buster
-
 stages:
-  - build
-  - test
-  - deploy
+    - build
+    - test
+    - deploy
+    - post
 
-variables:
-    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    WORKON_HOME: "$CI_PROJECT_DIR/venv"
+.pipenv_job: &pipenv_job
+    image: python:3.9.1-buster
+    before_script:
+        - pip install pipenv
+    variables:
+        PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+        WORKON_HOME: "$CI_PROJECT_DIR/venv"
 
-default:
-  before_script:
-    - pip install pipenv
+.python_formatter_linter_jobs_base: &python_formatter_linter_jobs_base
+    stage: test
+    dependencies: 
+        - install_pipenv
+    <<: *pipenv_job
 
-build:
-  stage: build
-  script:
-    - apt update -qy
-    - apt install -y libpq-dev
-    - env VIRTUALENV_COPIES=1 pipenv sync --dev
-  artifacts:
-    paths:
-      - .cache/pip
-      - venv/
+.node_formatter_linter_jobs_base: &node_formatter_linter_jobs_base
+    image: node:15.5.0-buster
+    stage: test
+    dependencies: 
+        - install_node
 
-test_pytest:
-  stage: test
-  script:
-    - pipenv run pytest
+install_pipenv:
+    stage: build
+    <<: *pipenv_job
+    script:
+        - env VIRTUALENV_COPIES=1 pipenv sync --dev
+    artifacts:
+        paths:
+            - .cache/pip
+            - venv/
+        expire_in: 1 day
+
+install_node:
+    image: node:15.5.0-buster
+    stage: build
+    script:
+        - yarn install
+    artifacts:
+        paths:
+            - node_modules/
+        expire_in: 1 day
+
+create_badge_svg:
+    image: python:3.9.1-buster
+    stage: post
+    dependencies: []
+    script:
+        - echo "Badges creating"
+    after_script:
+        - pip install anybadge
+        - commits=$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)
+        - anybadge -l "commits after tag" -v $commits -f commits.svg -u 5=green 10=orange 20=red 
+        - py_lines=$(( find backend -name '*.py' -print0 | xargs -0 cat ) | wc -l)
+        - anybadge -l "python lines" -v $py_lines -f py_lines.svg -c teal
+        - anybadge --label=awesomeness --value="110%" --file=awesomeness.svg --color=#97CA00
+    artifacts:
+        paths:
+            - commits.svg
+            - py_lines.svg
+            - awesomeness.svg
+    only:
+        - master
+    except:
+        - tags
+    allow_failure: true
+
+prettier:
+    <<: *node_formatter_linter_jobs_base
+    script:
+        - yarn run check-format
+
+eslint:
+    <<: *node_formatter_linter_jobs_base
+    before_script:
+        - yarn run check-eslint-config  
+    script:
+        - yarn run lint
 
 flake8:
-  stage: test
-  script:
-    - pipenv run flake8
+    <<: *python_formatter_linter_jobs_base
+    script:
+        - pipenv run flake8
 
 black:
-  stage: test
-  script:
-    - pipenv run black . --check
+    <<: *python_formatter_linter_jobs_base
+    script:
+        - pipenv run black . --check
+
+isort:
+    <<: *python_formatter_linter_jobs_base
+    script:
+        - pipenv run isort . --check
 
 heroku:
-  image: ruby:latest
+  image: ruby:3.0.0-buster
   stage: deploy
-  inherit:
-    default: false
   dependencies: []
   script:
     - apt update -qy
@@ -51,4 +106,6 @@ heroku:
     - gem install dpl
     - dpl --provider=heroku --app=hospital-organize-me --api-key=$HEROKU_API_KEY
   only:
-    - master
+    - tags
+  except:
+    - branches

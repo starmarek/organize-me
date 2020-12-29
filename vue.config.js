@@ -1,8 +1,6 @@
-// const IS_PRODUCTION = process.env.NODE_ENV === 'production'
-
 module.exports = {
-    outputDir: 'dist',
-    assetsDir: 'static',
+    outputDir: "dist",
+    assetsDir: "static",
     // baseUrl: IS_PRODUCTION
     // ? 'http://cdn123.com'
     // : '/',
@@ -11,11 +9,11 @@ module.exports = {
     // Whitenoise will serve once to CDN which will then cache
     // and distribute
     devServer: {
-      proxy: {
-        '/api*': {
-          // Forward frontend dev server request for /api to django dev server
-          target: 'http://django:8000/',
-        }
-      }
-    }
-  }
+        proxy: {
+            "/api*": {
+                // Forward frontend dev server request for /api to django dev server
+                target: "http://django:8000/",
+            },
+        },
+    },
+};
