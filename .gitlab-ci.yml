@@ -19,7 +19,7 @@ stages:
     <<: *pipenv_job
 
 .node_formatter_linter_jobs_base: &node_formatter_linter_jobs_base
-    image: node:15.5.0-buster
+    image: node:14.15.3-buster
     stage: test
     dependencies: 
         - install_node
@@ -36,7 +36,7 @@ install_pipenv:
         expire_in: 1 day
 
 install_node:
-    image: node:15.5.0-buster
+    image: node:14.15.3-buster
     stage: build
     script:
         - yarn install
