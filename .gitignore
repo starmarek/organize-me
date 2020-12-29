@@ -23,5 +23,9 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
 .pnp.*
-.yarn
