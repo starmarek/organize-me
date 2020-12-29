@@ -13,9 +13,9 @@ psycopg2-binary = "*"
 
 [dev-packages]
 pytest = "*"
-black = "==20.8b1"
 flake8 = "*"
 isort = "*"
+black = "==20.8b1"
 
 [requires]
 python_version = "3.9.1"

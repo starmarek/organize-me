@@ -5,10 +5,10 @@ The `urlpatterns` list routes URLs to views. For more information please see:
 """
 
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
 
-from .api.views import index_view, MessageViewSet
+from .api.views import MessageViewSet, index_view
 
 router = routers.DefaultRouter()
 router.register("messages", MessageViewSet)
