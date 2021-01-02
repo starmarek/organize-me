@@ -1,8 +1,10 @@
-FROM python:3.9.1-buster
+ARG CORE_PYTHON_VER
+FROM python:${CORE_PYTHON_VER}
 
 WORKDIR /app
 
 COPY Pipfile* ./
 
-RUN pip install pipenv
+ARG CORE_PIPENV_VER
+RUN pip install pipenv==${CORE_PIPENV_VER}
 RUN pipenv sync

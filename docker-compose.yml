@@ -5,6 +5,9 @@ services:
     build: 
       context: .
       dockerfile: docker/django.Dockerfile
+      args:
+        - CORE_PYTHON_VER=${CORE_PYTHON_VER}
+        - CORE_PIPENV_VER=${CORE_PIPENV_VER}
     command: docker/django_entrypoint.sh
     volumes:
       - .:/app
@@ -16,16 +19,20 @@ services:
       - db
 
   vue:
-    image: node:14.15.3-buster
+    image: node:${CORE_NODE_VER}
     working_dir: /app
     command: docker/vue_entrypoint.sh
     volumes:
       - .:/app
+    env_file:
+      - ./.env
     ports:
       - 8080:8080
+    depends_on:
+      - django
 
   db:
-    image: postgres:12-alpine
+    image: postgres:${CORE_POSTGRES_VER}
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
