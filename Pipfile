@@ -16,6 +16,10 @@ pytest = "*"
 flake8 = "*"
 isort = "*"
 black = "==20.8b1"
+coloredlogs = "*"
+python-dotenv = "*"
+fire = "*"
+toml = "*"
 
 [requires]
 python_version = "3.9.1"
