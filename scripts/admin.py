@@ -1,10 +1,8 @@
 import json
 import logging
 import os
-import platform
+import shlex
 import subprocess
-import sys
-from importlib.metadata import import_module, version
 from pathlib import Path
 
 import coloredlogs
@@ -50,12 +48,14 @@ with open("Pipfile", "r") as f:
 
 def build_containers(cache=True):
     log.info("Running build-containers command")
-    pass
+    subprocess.run(
+        shlex.split(f"docker-compose build --force-rm --parallel {'' if cache else '--no-cache'}"), check=True
+    )
 
 
 def run_containers():
     log.info("Running run-containers command")
-    pass
+    subprocess.run(shlex.split("docker-compose up --detach --remove-orphans --force-recreate"), check=True)
 
 
 def _update_virtualenv_vscode_pythonpath():
@@ -82,7 +82,7 @@ def _update_virtualenv_vscode_pythonpath():
 
 def init(vscode=False):
     log.info("Running init command")
-    build_containers()
+    build_containers(cache=False)
     run_containers()
     if vscode:
         _update_virtualenv_vscode_pythonpath()
