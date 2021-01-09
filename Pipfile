@@ -20,6 +20,7 @@ coloredlogs = "*"
 python-dotenv = "*"
 fire = "*"
 toml = "*"
+"ruamel.yaml" = "*"
 
 [requires]
 python_version = "3.9.1"

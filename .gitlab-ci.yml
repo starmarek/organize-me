@@ -4,8 +4,12 @@ stages:
     - deploy
     - post
 
+variables:
+    PYTHON_VERSION: "3.9.1"
+    NODE_VERSION: "14.15.3"
+
 .pipenv_job: &pipenv_job
-    image: python:3.9.1-buster
+    image: python:$PYTHON_VERSION
     before_script:
         - pip install pipenv
     variables:
@@ -14,14 +18,14 @@ stages:
 
 .python_formatter_linter_jobs_base: &python_formatter_linter_jobs_base
     stage: test
-    dependencies: 
+    dependencies:
         - install_pipenv
     <<: *pipenv_job
 
 .node_formatter_linter_jobs_base: &node_formatter_linter_jobs_base
-    image: node:14.15.3-buster
+    image: node:$NODE_VERSION
     stage: test
-    dependencies: 
+    dependencies:
         - install_node
 
 install_pipenv:
@@ -36,7 +40,7 @@ install_pipenv:
         expire_in: 1 day
 
 install_node:
-    image: node:14.15.3-buster
+    image: node:$NODE_VERSION
     stage: build
     script:
         - yarn install
@@ -46,7 +50,7 @@ install_node:
         expire_in: 1 day
 
 create_badge_svg:
-    image: python:3.9.1-buster
+    image: python:$PYTHON_VERSION
     stage: post
     dependencies: []
     script:
@@ -54,7 +58,7 @@ create_badge_svg:
     after_script:
         - pip install anybadge
         - commits=$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)
-        - anybadge -l "commits after tag" -v $commits -f commits.svg -u 5=green 10=orange 20=red 
+        - anybadge -l "commits after tag" -v $commits -f commits.svg -u 5=green 10=orange 20=red
         - py_lines=$(( find backend -name '*.py' -print0 | xargs -0 cat ) | wc -l)
         - anybadge -l "python lines" -v $py_lines -f py_lines.svg -c teal
         - anybadge --label=awesomeness --value="110%" --file=awesomeness.svg --color=#97CA00
@@ -77,7 +81,7 @@ prettier:
 eslint:
     <<: *node_formatter_linter_jobs_base
     before_script:
-        - yarn run check-eslint-config  
+        - yarn run check-eslint-config
     script:
         - yarn run lint
 
@@ -97,15 +101,15 @@ isort:
         - pipenv run isort . --check
 
 heroku:
-  image: ruby:3.0.0-buster
-  stage: deploy
-  dependencies: []
-  script:
-    - apt update -qy
-    - apt install -y ruby-dev
-    - gem install dpl
-    - dpl --provider=heroku --app=hospital-organize-me --api-key=$HEROKU_API_KEY
-  only:
-    - tags
-  except:
-    - branches
+    image: ruby:3.0.0
+    stage: deploy
+    dependencies: []
+    script:
+        - apt update -qy
+        - apt install -y ruby-dev
+        - gem install dpl
+        - dpl --provider=heroku --app=hospital-organize-me --api-key=$HEROKU_API_KEY
+    only:
+        - tags
+    except:
+        - branches
