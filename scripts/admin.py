@@ -53,6 +53,26 @@ def update_python(ver):
         _update_virtualenv_vscode_pythonpath()
 
 
+def update_node(ver):
+    log.info("Running update_node command")
+
+    dotenv.set_key(dotenv_file, "CORE_NODE_VER", ver, "")
+    dotenv.set_key(dotenv_template, "CORE_NODE_VER", ver, "")
+    dotenv.load_dotenv(dotenv_file, verbose=True, override=True)
+    ground_up_containers(False)
+
+    gitlab_ci["variables"]["NODE_VERSION"] = ver
+    with open(".gitlab-ci.yml", "r+") as f:
+        yaml.dump(gitlab_ci, f)
+
+    with open("package.json", "r") as f:
+        data = json.load(f)
+    data["engines"]["node"] = ver
+    with open("package.json", "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+
+
 def build_containers(cache=True):
     log.info("Running build-containers command")
 
@@ -89,7 +109,7 @@ def _update_virtualenv_vscode_pythonpath():
                 json_decoded = json.load(f)
             json_decoded["python.pythonPath"] = f"{virtualenv_path}/bin/python"
             with open(settings_file, "w") as f:
-                json.dump(json_decoded, f)
+                json.dump(json_decoded, f, indent=2)
         except json.JSONDecodeError:
             log.error(f"Couldn't parse your {settings_file} file. Please make sure that it's valid.")
             raise
