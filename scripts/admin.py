@@ -59,7 +59,7 @@ def update_node(ver):
     dotenv.set_key(dotenv_file, "CORE_NODE_VER", ver, "")
     dotenv.set_key(dotenv_template, "CORE_NODE_VER", ver, "")
     dotenv.load_dotenv(dotenv_file, verbose=True, override=True)
-    ground_up_containers(False)
+    ground_up_containers(cache=False)
 
     gitlab_ci["variables"]["NODE_VERSION"] = ver
     with open(".gitlab-ci.yml", "r+") as f:
@@ -90,7 +90,7 @@ def run_containers():
 def ground_up_containers(cache=True):
     log.info("Running ground-up-containers command")
 
-    build_containers(cache)
+    build_containers(cache=cache)
     run_containers()
 
 
@@ -118,8 +118,7 @@ def _update_virtualenv_vscode_pythonpath():
 def init():
     log.info("Running init command")
 
-    build_containers(cache=False)
-    run_containers()
+    ground_up_containers(cache=False)
     if os.environ["TERM_PROGRAM"] == "vscode":
         _update_virtualenv_vscode_pythonpath()
 
