@@ -30,4 +30,4 @@ if [[ -n ${VIRTUAL_ENV} ]]; then
 fi
 
 python_path=$(pipenv run which python 2> /dev/null)
-${python_path} scripts/admin.py "$@"
+${python_path} scripts/admin/admin.py "$@"
