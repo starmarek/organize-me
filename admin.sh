@@ -23,6 +23,11 @@ if ! pipenv --venv &> /dev/null; then
     pipenv sync --dev || exit 1
 fi
 
+# force to run outside virtualenv
+if [[ -n ${VIRTUAL_ENV} ]]; then
+    # shellcheck disable=SC1091
+    source deactivate
+fi
 
 python_path=$(pipenv run which python 2> /dev/null)
 ${python_path} scripts/admin.py "$@"

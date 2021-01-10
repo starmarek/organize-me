@@ -17,46 +17,37 @@ coloredlogs.install(level="DEBUG")
 dotenv_file = dotenv.find_dotenv()
 dotenv_template = dotenv.find_dotenv(".template.env")
 dotenv.load_dotenv(dotenv_file, verbose=True, override=True)
+
 with open("Pipfile", "r") as f:
     pipfile = toml.load(f, _dict=dict)
+
 with open(".gitlab-ci.yml", "r") as f:
     gitlab_ci, sequence, block = ruamel.yaml.util.load_yaml_guess_indent(f, preserve_quotes=True)
 yaml = ruamel.yaml.YAML()
 yaml.width = 4096
 yaml.indent(mapping=block, sequence=sequence, offset=block)
 
-# def assert_python_package(package, to_assert):
-#     # assert platform.python_version() == os.environ["PYTHON_VER"], "Please use proper version of python"
-#     if version(package) != to_assert:
-#         log.warning(
-#             f"You should consider using different version of {package}. Actually tested version is {to_assert}"
-#         )
-# assert (
-#     version("python-dotenv") == os.environ["ADMIN_DOTENV_VER"]
-# ), "Please use proper version of python-dotenv package"
-# assert version("fire") == os.environ["ADMIN_FIRE_VER"], "Please use proper version of fire package"
-# assert version("toml") == os.environ["ADMIN_TOML_VER"], "Please use proper version of toml package"
-# assert version("pipenv") == os.environ["PIPENV_VER"], "Please use proper version of pipenv package"
 
-
-def update_python(ver, vscode=False):
+def update_python(ver):
     log.info("Running update_python command")
 
-    dotenv.set_key(dotenv_file, "CORE_PYTHON_VER", ver, "")
-    dotenv.set_key(dotenv_template, "CORE_PYTHON_VER", ver, "")
-
+    subprocess.run(["pipenv", "--rm"], check=True)
     pipfile["requires"]["python_version"] = ver
     with open("Pipfile", "r+") as f:
         toml.dump(pipfile, f)
+    subprocess.run(["pipenv", "update", "--keep-outdated", "--dev"], check=True)
+
+    dotenv.set_key(dotenv_file, "CORE_PYTHON_VER", ver, "")
+    dotenv.set_key(dotenv_template, "CORE_PYTHON_VER", ver, "")
 
     gitlab_ci["variables"]["PYTHON_VERSION"] = ver
     with open(".gitlab-ci.yml", "r+") as f:
         yaml.dump(gitlab_ci, f)
 
-    subprocess.run(["pipenv", "--rm"], check=True)
-    subprocess.run(["pipenv", "update", "--keep-outdated", "--dev"], check=True)
+    with open("runtime.txt", "w") as f:
+        f.write(f"python-{ver}\n")
 
-    if vscode:
+    if os.environ["TERM_PROGRAM"] == "vscode":
         _update_virtualenv_vscode_pythonpath()
 
 
@@ -96,12 +87,12 @@ def _update_virtualenv_vscode_pythonpath():
     print("\033[33m\nIf you use your builtin vscode commandprompt - please restart it\033[0m")
 
 
-def init(vscode=False):
+def init():
     log.info("Running init command")
 
     build_containers(cache=False)
     run_containers()
-    if vscode:
+    if os.environ["TERM_PROGRAM"] == "vscode":
         _update_virtualenv_vscode_pythonpath()
 
 

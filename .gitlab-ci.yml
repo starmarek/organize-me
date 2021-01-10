@@ -5,6 +5,8 @@ stages:
     - post
 
 variables:
+    # do not change those by hand!
+    # use admin script to bump versions
     PYTHON_VERSION: "3.9.1"
     NODE_VERSION: "14.15.3"
 
