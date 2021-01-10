@@ -39,6 +39,8 @@ def update_python(ver):
 
     dotenv.set_key(dotenv_file, "CORE_PYTHON_VER", ver, "")
     dotenv.set_key(dotenv_template, "CORE_PYTHON_VER", ver, "")
+    dotenv.load_dotenv(dotenv_file, verbose=True, override=True)
+    ground_up_containers(False)
 
     gitlab_ci["variables"]["PYTHON_VERSION"] = ver
     with open(".gitlab-ci.yml", "r+") as f:
@@ -65,6 +67,13 @@ def run_containers():
     subprocess.run(shlex.split("docker-compose up --detach --remove-orphans --force-recreate"), check=True)
 
 
+def ground_up_containers(cache=True):
+    log.info("Running ground-up-containers command")
+
+    build_containers(cache)
+    run_containers()
+
+
 def _update_virtualenv_vscode_pythonpath():
     settings_file = ".vscode/settings.json"
     virtualenv_path = subprocess.run(["pipenv", "--venv"], capture_output=True, text=True, check=True).stdout.strip()
@@ -84,7 +93,6 @@ def _update_virtualenv_vscode_pythonpath():
         except json.JSONDecodeError:
             log.error(f"Couldn't parse your {settings_file} file. Please make sure that it's valid.")
             raise
-    print("\033[33m\nIf you use your builtin vscode commandprompt - please restart it\033[0m")
 
 
 def init():
