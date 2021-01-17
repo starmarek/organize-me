@@ -6,11 +6,8 @@ import subprocess
 from pathlib import Path
 
 import coloredlogs
-import dotenv
 import fire
-import ruamel.yaml
-import toml
-from adminFiles import DotenvFile, JsonFile, TomlFile, YamlFile
+from adminFiles import DotenvFile, JsonFile, TomlFile, TxtFile, YamlFile
 
 log = logging.getLogger("admin")
 coloredlogs.install(level="DEBUG")
@@ -33,70 +30,50 @@ def _update_virtualenv_vscode_pythonpath():
 
 
 class CLI:
-    def update(self, item):
-        log.info("Running update command")
+    def update_python(self, ver):
+        pipfile_file = TomlFile(path="Pipfile")
+        dotenv_template_file = DotenvFile(path=".template.env")
+        gitlab_ci_file = YamlFile(path=".gitlab-ci.yml")
+        runtime_txt_file = TxtFile(path="runtime.txt")
 
-        update_func_map = {
-            "python": _update_python,
-            "node": _update_node,
-            "compose": _update_compose,
-            **dict.fromkeys(
-                ["postgres", "pipenv"],
-                _regular_update,
-            ),
-        }
-
-    def _regular_update(self, item, ver):
-        pass
-
-    def update_compose(self, item, ver):
-        pass
-
-    def _update_python(self, ver):
         subprocess.run(["pipenv", "--rm"], check=True)
-        pipfile["requires"]["python_version"] = ver
-        with open("Pipfile", "r+") as f:
-            toml.dump(pipfile, f)
+        pipfile_file["requires"]["python_version"] = ver
+        pipfile_file.dump()
         subprocess.run(["pipenv", "update", "--keep-outdated", "--dev"], check=True)
 
-        dotenv.set_key(dotenv_file, "CORE_PYTHON_VER", ver, "")
-        dotenv.set_key(dotenv_template, "CORE_PYTHON_VER", ver, "")
-        dotenv.load_dotenv(dotenv_file, verbose=True, override=True)
-        ground_up_containers(False)
+        dotenv_template_file["CORE_PYTHON_VER"] = ver
+        dotenv_file["CORE_PYTHON_VER"] = ver
+        self.ground_up_containers(cache=False)
 
-        gitlab_ci["variables"]["PYTHON_VERSION"] = ver
-        with open(".gitlab-ci.yml", "r+") as f:
-            yaml.dump(gitlab_ci, f)
+        gitlab_ci_file["variables"]["PYTHON_VERSION"] = ver
+        gitlab_ci_file.dump()
 
-        with open("runtime.txt", "w") as f:
-            f.write(f"python-{ver}\n")
+        runtime_txt_file.data = [f"python-{ver}"]
+        runtime_txt_file.dump()
 
         if running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
-    def _update_node(self, ver):
-        dotenv.set_key(dotenv_file, "CORE_NODE_VER", ver, "")
-        dotenv.set_key(dotenv_template, "CORE_NODE_VER", ver, "")
-        dotenv.load_dotenv(dotenv_file, verbose=True, override=True)
-        ground_up_containers(cache=False)
+    def update_node(self, ver):
+        dotenv_template_file = DotenvFile(path=".template.env")
+        gitlab_ci_file = YamlFile(path=".gitlab-ci.yml")
+        package_json_file = JsonFile(path="package.json")
 
-        gitlab_ci["variables"]["NODE_VERSION"] = ver
-        with open(".gitlab-ci.yml", "r+") as f:
-            yaml.dump(gitlab_ci, f)
+        dotenv_template_file["CORE_NODE_VER"] = ver
+        dotenv_file["CORE_NODE_VER"] = ver
 
-        with open("package.json", "r") as f:
-            data = json.load(f)
-        data["engines"]["node"] = ver
-        with open("package.json", "w") as f:
-            json.dump(data, f, indent=2)
-            f.write("\n")
+        self.ground_up_containers(cache=False)
+
+        gitlab_ci_file["variables"]["NODE_VERSION"] = ver
+        gitlab_ci_file.dump()
+
+        package_json_file["engines"]["node"] = ver
+        package_json_file.dump()
 
     def build_containers(self, cache=True):
         log.info("Running build-containers command")
 
-        subprocess.run(
-            shlex.split(f"docker-compose build --force-rm --parallel {'' if cache else '--no-cache'}"), check=True
-        )
+        subprocess.run(shlex.split(f"docker-compose build --force-rm {'' if cache else '--no-cache'}"), check=True)
 
     def run_containers(self):
         log.info("Running run-containers command")
@@ -106,24 +83,17 @@ class CLI:
     def ground_up_containers(self, cache=True):
         log.info("Running ground-up-containers command")
 
-        build_containers(cache=cache)
-        run_containers()
+        self.build_containers(cache=cache)
+        self.run_containers()
 
     def init(self):
         log.info("Running init command")
 
-        # ground_up_containers(cache=False)
+        self.ground_up_containers(cache=False)
         if running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
-
-    def dummy(self):
-        dd = JsonFile(str(Path(".vscode/settings.json").resolve()))
-        exit()
-        dd["POSTGRES_DB"] = "joachim"
-        print(dd["POSTGRES_DB"])
-        print(dd)
 
 
 if __name__ == "__main__":
     log.info("Starting admin script")
-    fire.Fire()
+    fire.Fire(CLI)
