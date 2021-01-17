@@ -7,7 +7,8 @@ from pathlib import Path
 
 import coloredlogs
 import fire
-from adminFiles import DotenvFile, JsonFile, TomlFile, TxtFile, YamlFile
+
+from .adminFiles import DotenvFile, JsonFile, TomlFile, TxtFile, YamlFile
 
 log = logging.getLogger("admin")
 coloredlogs.install(level="DEBUG")
