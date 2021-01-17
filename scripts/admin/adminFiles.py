@@ -10,13 +10,14 @@ log = logging.getLogger(__name__)
 
 
 class ProjectFile:
-    def __init__(self, path):
+    def __init__(self, path, data_type):
         try:
             self._path = str(Path(path).resolve(strict=True))
         except FileNotFoundError:
             log.warning(f"Path {path} does not exist! This can cause trouble later.")
             self._path = path
         self.name = self.path.split("/")[-1]
+        self.desired_data_type = data_type
 
     def load(self, func, **kwargs):
         try:
@@ -36,6 +37,10 @@ class ProjectFile:
 
     @data.setter
     def data(self, value):
+        if not isinstance(value, self.desired_data_type):
+            raise TypeError(
+                f"Data field of {self} should be of type {self.desired_data_type}. You have tried to set is as {type(value)}"
+            )
         self._data = value
 
     def __getitem__(self, index):
@@ -47,6 +52,9 @@ class ProjectFile:
         except TypeError:
             log.error("Can't assing value! Something must be wrong with your file...")
             raise
+        except IndexError:
+            log.error("Can't set value at that index. Are you sure your file is long enough?")
+            raise
 
     def __repr__(self):
         return f"{type(self).__name__}(path={self.path!r} name={self.name!r})"
@@ -54,7 +62,7 @@ class ProjectFile:
 
 class TomlFile(ProjectFile):
     def __init__(self, path):
-        super().__init__(path)
+        super().__init__(path, dict)
         self._data = super().load(func=toml.load, _dict=dict)
 
     def dump(self):
@@ -64,7 +72,7 @@ class TomlFile(ProjectFile):
 
 class JsonFile(ProjectFile):
     def __init__(self, path):
-        super().__init__(path)
+        super().__init__(path, dict)
         try:
             self._data = super().load(func=json.load)
         except json.JSONDecodeError:
@@ -79,7 +87,7 @@ class JsonFile(ProjectFile):
 
 class YamlFile(ProjectFile):
     def __init__(self, path):
-        super().__init__(path)
+        super().__init__(path, dict)
         self.yaml = ruamel.yaml.YAML()
         self.yaml.width = 4096  # Large number to prevent line wrapping
         self._data, sequence_len, block_len = super().load(
@@ -94,7 +102,7 @@ class YamlFile(ProjectFile):
 
 class DotenvFile(ProjectFile):
     def __init__(self, path):
-        super().__init__(path)
+        super().__init__(path, dict)
         self._data = dotenv.dotenv_values(self.path)
         dotenv.load_dotenv(self.path, verbose=True, override=True)
 
@@ -102,3 +110,21 @@ class DotenvFile(ProjectFile):
         self.data[index] = value
         dotenv.set_key(self.path, index, value, "")
         dotenv.load_dotenv(self.path, verbose=True, override=True)
+
+
+class TxtFile(ProjectFile):
+    def __init__(self, path):
+        super().__init__(path, list)
+        self._data = self.load()
+
+    def load(self):
+        try:
+            with open(self.path, "r") as f:
+                return f.read().splitlines()
+        except FileNotFoundError:
+            log.warning(f"Requested file {self.path} is missing. Creating object with empty `data` slot.")
+            return None
+
+    def dump(self):
+        with open(self.path, "w") as f:
+            f.write("\n".join(str(item) for item in self.data) + "\n")
