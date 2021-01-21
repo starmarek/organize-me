@@ -31,6 +31,19 @@ def _update_virtualenv_vscode_pythonpath():
 
 
 class CLI:
+    def update_compose(self, ver):
+        ver = str(ver)
+        compose_file = YamlFile(path="docker-compose.yml")
+        dotenv_template_file = DotenvFile(path=".template.env")
+
+        dotenv_file["CORE_COMPOSE_VER"] = ver
+        dotenv_template_file["CORE_COMPOSE_VER"] = ver
+
+        compose_file["version"] = ver
+        compose_file.dump()
+
+        self.ground_up_containers(cache=False)
+
     def update_python(self, ver):
         pipfile_file = TomlFile(path="Pipfile")
         dotenv_template_file = DotenvFile(path=".template.env")
@@ -72,24 +85,16 @@ class CLI:
         package_json_file.dump()
 
     def build_containers(self, cache=True):
-        log.info("Running build-containers command")
-
         subprocess.run(shlex.split(f"docker-compose build --force-rm {'' if cache else '--no-cache'}"), check=True)
 
     def run_containers(self):
-        log.info("Running run-containers command")
-
         subprocess.run(shlex.split("docker-compose up --detach --remove-orphans --force-recreate"), check=True)
 
     def ground_up_containers(self, cache=True):
-        log.info("Running ground-up-containers command")
-
         self.build_containers(cache=cache)
         self.run_containers()
 
     def init(self):
-        log.info("Running init command")
-
         self.ground_up_containers(cache=False)
         if running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
