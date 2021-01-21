@@ -13,8 +13,14 @@ from .adminFiles import DotenvFile, JsonFile, TomlFile, TxtFile, YamlFile
 log = logging.getLogger("admin")
 coloredlogs.install(level="DEBUG")
 
+
 dotenv_file = DotenvFile(path=".env")
-running_in_vscode = os.environ["TERM_PROGRAM"] == "vscode"
+compose_file = YamlFile(path="docker-compose.yml")
+dotenv_template_file = DotenvFile(path=".template.env")
+gitlab_ci_file = YamlFile(path=".gitlab-ci.yml")
+runtime_txt_file = TxtFile(path="runtime.txt")
+pipfile_file = TomlFile(path="Pipfile")
+package_json_file = JsonFile(path="package.json")
 
 
 def _update_virtualenv_vscode_pythonpath():
@@ -28,13 +34,25 @@ def _update_virtualenv_vscode_pythonpath():
     else:
         settings_file.data = json.loads(json.dumps({"python.pythonPath": f"{virtualenv_path}/bin/python"}))
         settings_file.dump()
+    log.info(f"Setting vscode pythonpath to '{virtualenv_path}/bin/python'")
+
+
+def _verify_versions():
+    pass
 
 
 class CLI:
+    def __init__(self, vscode=False):
+        try:
+            self.running_in_vscode = os.environ["TERM_PROGRAM"] == "vscode"
+        except KeyError:
+            self.running_in_vscode = False
+
+        if vscode:
+            self.running_in_vscode = True
+
     def update_compose(self, ver):
         ver = str(ver)
-        compose_file = YamlFile(path="docker-compose.yml")
-        dotenv_template_file = DotenvFile(path=".template.env")
 
         dotenv_file["CORE_COMPOSE_VER"] = ver
         dotenv_template_file["CORE_COMPOSE_VER"] = ver
@@ -45,11 +63,6 @@ class CLI:
         self.ground_up_containers(cache=False)
 
     def update_python(self, ver):
-        pipfile_file = TomlFile(path="Pipfile")
-        dotenv_template_file = DotenvFile(path=".template.env")
-        gitlab_ci_file = YamlFile(path=".gitlab-ci.yml")
-        runtime_txt_file = TxtFile(path="runtime.txt")
-
         subprocess.run(["pipenv", "--rm"], check=True)
         pipfile_file["requires"]["python_version"] = ver
         pipfile_file.dump()
@@ -65,14 +78,10 @@ class CLI:
         runtime_txt_file.data = [f"python-{ver}"]
         runtime_txt_file.dump()
 
-        if running_in_vscode:
+        if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
     def update_node(self, ver):
-        dotenv_template_file = DotenvFile(path=".template.env")
-        gitlab_ci_file = YamlFile(path=".gitlab-ci.yml")
-        package_json_file = JsonFile(path="package.json")
-
         dotenv_template_file["CORE_NODE_VER"] = ver
         dotenv_file["CORE_NODE_VER"] = ver
 
@@ -85,9 +94,11 @@ class CLI:
         package_json_file.dump()
 
     def build_containers(self, cache=True):
+        log.info(f"Building containers with 'cache={cache}'")
         subprocess.run(shlex.split(f"docker-compose build --force-rm {'' if cache else '--no-cache'}"), check=True)
 
     def run_containers(self):
+        log.info("Running containers")
         subprocess.run(shlex.split("docker-compose up --detach --remove-orphans --force-recreate"), check=True)
 
     def ground_up_containers(self, cache=True):
@@ -96,7 +107,7 @@ class CLI:
 
     def init(self):
         self.ground_up_containers(cache=False)
-        if running_in_vscode:
+        if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
 
