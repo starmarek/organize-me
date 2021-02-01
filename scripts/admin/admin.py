@@ -8,19 +8,20 @@ from pathlib import Path
 import coloredlogs
 import fire
 
-from .adminFiles import DotenvFile, JsonFile, TomlFile, TxtFile, YamlFile
+from .adminFiles import DockerComposeFile, DotenvFile, GitlabCIFile, JsonFile, PackageJsonFile, Pipfile, RuntimeTxtFile
 
 log = logging.getLogger("admin")
 coloredlogs.install(level="DEBUG")
 
 
 dotenv_file = DotenvFile(path=".env")
-compose_file = YamlFile(path="docker-compose.yml")
+compose_file = DockerComposeFile(path="docker-compose.yml")
 dotenv_template_file = DotenvFile(path=".template.env")
-gitlab_ci_file = YamlFile(path=".gitlab-ci.yml")
-runtime_txt_file = TxtFile(path="runtime.txt")
-pipfile_file = TomlFile(path="Pipfile")
-package_json_file = JsonFile(path="package.json")
+gitlab_ci_file = GitlabCIFile(path=".gitlab-ci.yml")
+runtime_txt_file = RuntimeTxtFile(path="runtime.txt")
+pipfile_file = Pipfile(path="Pipfile")
+package_json_file = PackageJsonFile(path="package.json")
+verifiable_files = [compose_file, gitlab_ci_file, pipfile_file, runtime_txt_file, package_json_file]
 
 
 def _update_virtualenv_vscode_pythonpath():
@@ -37,8 +38,24 @@ def _update_virtualenv_vscode_pythonpath():
     log.info(f"Setting vscode pythonpath to '{virtualenv_path}/bin/python'")
 
 
+def _verify_dotenvs():
+    assert all(val == dotenv_template_file[key] for key, val in dotenv_file.data.items() if key.startswith("CORE"))
+
+
 def _verify_versions():
-    pass
+    curr = dotenv_file
+    reference = dotenv_template_file
+    try:
+        _verify_dotenvs()
+        reference = dotenv_file
+        for ver_file in verifiable_files:
+            curr = ver_file
+            assert ver_file.verify_core_versions()
+    except AssertionError:
+        log.error(
+            f"There is a mismatch between {curr.name} and {reference.name}! Make sure that you are using admin script to bump versions of packages!"
+        )
+        raise
 
 
 class CLI:
@@ -54,8 +71,9 @@ class CLI:
     def update_compose(self, ver):
         ver = str(ver)
 
-        dotenv_file["CORE_COMPOSE_VER"] = ver
         dotenv_template_file["CORE_COMPOSE_VER"] = ver
+        dotenv_file["CORE_COMPOSE_VER"] = ver
+        dotenv_file.dump_to_env()
 
         compose_file["version"] = ver
         compose_file.dump()
@@ -70,6 +88,7 @@ class CLI:
 
         dotenv_template_file["CORE_PYTHON_VER"] = ver
         dotenv_file["CORE_PYTHON_VER"] = ver
+        dotenv_file.dump_to_env()
         self.ground_up_containers(cache=False)
 
         gitlab_ci_file["variables"]["PYTHON_VERSION"] = ver
@@ -84,6 +103,7 @@ class CLI:
     def update_node(self, ver):
         dotenv_template_file["CORE_NODE_VER"] = ver
         dotenv_file["CORE_NODE_VER"] = ver
+        dotenv_file.dump_to_env()
 
         self.ground_up_containers(cache=False)
 
@@ -113,4 +133,5 @@ class CLI:
 
 if __name__ == "__main__":
     log.info("Starting admin script")
+    _verify_versions()
     fire.Fire(CLI)

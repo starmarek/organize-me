@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from pathlib import Path
 
 import dotenv
@@ -12,10 +13,10 @@ log = logging.getLogger(__name__)
 class ProjectFile:
     def __init__(self, path, data_type):
         try:
-            self._path = str(Path(path).resolve(strict=True))
+            self.path = str(Path(path).resolve(strict=True))
         except FileNotFoundError:
             log.warning(f"Path {path} does not exist! This can cause trouble later.")
-            self._path = path
+            self.path = path
         self.name = self.path.split("/")[-1]
         self.desired_data_type = data_type
 
@@ -26,10 +27,6 @@ class ProjectFile:
         except FileNotFoundError:
             log.warning(f"Requested file {self.path} is missing. Creating object with empty `data` slot.")
             return None
-
-    @property
-    def path(self):
-        return self._path
 
     @property
     def data(self):
@@ -60,7 +57,26 @@ class ProjectFile:
         return f"{type(self).__name__}(path={self.path!r} name={self.name!r})"
 
 
-class TomlFile(ProjectFile):
+class VerifiableFile(ProjectFile):
+    def __init__(self, path, data_type):
+        super().__init__(path, data_type)
+        self.core_versions = {proto: os.environ[proto] for proto in self.core_versions_prototypes.keys()}
+
+    def verify_core_versions(self):
+        return all(
+            self.core_versions[proto] == self.get_core_version_from_file_data(proto)
+            for proto in self.core_versions_prototypes.keys()
+        )
+
+    def get_core_version_from_file_data(self, proto):
+        data = self
+        for item in self.core_versions_prototypes[proto]:
+            data = data[item]
+
+        return data
+
+
+class TomlFile(VerifiableFile):
     def __init__(self, path):
         super().__init__(path, dict)
         self._data = super().load(func=toml.load, _dict=dict)
@@ -70,7 +86,7 @@ class TomlFile(ProjectFile):
             toml.dump(self.data, f)
 
 
-class JsonFile(ProjectFile):
+class JsonFile(VerifiableFile):
     def __init__(self, path):
         super().__init__(path, dict)
         try:
@@ -85,7 +101,7 @@ class JsonFile(ProjectFile):
             f.write("\n")
 
 
-class YamlFile(ProjectFile):
+class YamlFile(VerifiableFile):
     def __init__(self, path):
         super().__init__(path, dict)
         self.yaml = ruamel.yaml.YAML()
@@ -109,10 +125,12 @@ class DotenvFile(ProjectFile):
     def __setitem__(self, index, value):
         self.data[index] = value
         dotenv.set_key(self.path, index, value, "")
+
+    def dump_to_env(self):
         dotenv.load_dotenv(self.path, verbose=True, override=True)
 
 
-class TxtFile(ProjectFile):
+class TxtFile(VerifiableFile):
     def __init__(self, path):
         super().__init__(path, list)
         self._data = self.load()
@@ -128,3 +146,48 @@ class TxtFile(ProjectFile):
     def dump(self):
         with open(self.path, "w") as f:
             f.write("\n".join(str(item) for item in self.data) + "\n")
+
+
+class Pipfile(TomlFile):
+    def __init__(self, path):
+        self.core_versions_prototypes = {
+            "CORE_PYTHON_VER": ("requires", "python_version"),
+        }
+        super().__init__(path)
+
+
+class GitlabCIFile(YamlFile):
+    def __init__(self, path):
+        self.core_versions_prototypes = {
+            "CORE_PYTHON_VER": ("variables", "PYTHON_VERSION"),
+            "CORE_NODE_VER": ("variables", "NODE_VERSION"),
+        }
+        super().__init__(path)
+
+
+class DockerComposeFile(YamlFile):
+    def __init__(self, path):
+        self.core_versions_prototypes = {
+            "CORE_COMPOSE_VER": ("version",),
+        }
+        super().__init__(path)
+
+
+class PackageJsonFile(JsonFile):
+    def __init__(self, path):
+        self.core_versions_prototypes = {
+            "CORE_NODE_VER": ("engines", "node"),
+            "CORE_YARN_VER": ("engines", "yarn"),
+        }
+        super().__init__(path)
+
+
+class RuntimeTxtFile(TxtFile):
+    def __init__(self, path):
+        self.core_versions_prototypes = {
+            "CORE_PYTHON_VER": None,
+        }
+        super().__init__(path)
+
+    def get_core_version_from_file_data(self, proto):
+        return self[0].split("-")[1]
