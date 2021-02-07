@@ -70,6 +70,13 @@ class CLI:
         if vscode:
             self.running_in_vscode = True
 
+    def update_postgres(self, ver):
+        dotenv_template_file["CORE_POSTGRES_VER"] = ver
+        dotenv_file["CORE_POSTGRES_VER"] = ver
+        dotenv_file.dump_to_env()
+
+        self.ground_up_containers(cache=False)
+
     def update_compose(self, ver):
         ver = str(ver)
 
