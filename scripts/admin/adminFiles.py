@@ -180,6 +180,22 @@ class DockerComposeFile(YamlFile, VerifiableFile):
         VerifiableFile.__init__(self)
 
 
+class YarnRCFile(YamlFile, VerifiableFile):
+    def __init__(self, path):
+        self.core_versions_prototypes = {
+            "CORE_YARN_VER": ("yarnPath",),
+        }
+        YamlFile.__init__(self, path)
+        VerifiableFile.__init__(self)
+
+    def get_core_version_from_file_data(self, proto):
+        data = self
+        for item in self.core_versions_prototypes[proto]:
+            data = data[item]
+
+        return os.path.splitext(data.split("/")[-1])[0].split("-")[1]
+
+
 class PackageJsonFile(JsonFile, VerifiableFile):
     def __init__(self, path):
         self.core_versions_prototypes = {

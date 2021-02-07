@@ -4,11 +4,21 @@ import os
 import shlex
 import subprocess
 from pathlib import Path
+from types import SimpleNamespace
 
 import coloredlogs
 import fire
 
-from .adminFiles import DockerComposeFile, DotenvFile, GitlabCIFile, JsonFile, PackageJsonFile, Pipfile, RuntimeTxtFile
+from .adminFiles import (
+    DockerComposeFile,
+    DotenvFile,
+    GitlabCIFile,
+    JsonFile,
+    PackageJsonFile,
+    Pipfile,
+    RuntimeTxtFile,
+    YarnRCFile,
+)
 
 log = logging.getLogger("admin")
 coloredlogs.install(level="DEBUG")
@@ -18,10 +28,11 @@ dotenv_file = DotenvFile(path=".env")
 compose_file = DockerComposeFile(path="docker-compose.yml")
 dotenv_template_file = DotenvFile(path=".template.env")
 gitlab_ci_file = GitlabCIFile(path=".gitlab-ci.yml")
+yarnrc_file = YarnRCFile(path=".yarnrc.yml")
 runtime_txt_file = RuntimeTxtFile(path="runtime.txt")
 pipfile_file = Pipfile(path="Pipfile")
 package_json_file = PackageJsonFile(path="package.json")
-verifiable_files = [compose_file, gitlab_ci_file, pipfile_file, runtime_txt_file, package_json_file]
+verifiable_files = [compose_file, gitlab_ci_file, pipfile_file, runtime_txt_file, package_json_file, yarnrc_file]
 
 
 def _update_virtualenv_vscode_pythonpath():
@@ -43,12 +54,21 @@ def _verify_dotenvs():
     assert all(val == dotenv_template_file[key] for key, val in dotenv_file.data.items() if key.startswith("CORE"))
 
 
+def _verify_yarn_executable():
+    log.info("Verifying yarn compatibility")
+    assert any(os.getenv("CORE_YARN_VER") in yarn_executable for yarn_executable in os.listdir(".yarn/releases"))
+
+
 def _verify_versions():
     curr = dotenv_file
     reference = dotenv_template_file
     try:
         _verify_dotenvs()
+
         reference = dotenv_file
+        curr = SimpleNamespace(name="files in .yarn/releases dir")
+        _verify_yarn_executable()
+
         log.info("Verifying compatibility of core versions")
         for ver_file in verifiable_files:
             curr = ver_file
@@ -69,6 +89,24 @@ class CLI:
 
         if vscode:
             self.running_in_vscode = True
+
+    def update_yarn(self, ver):
+        log.info("Upgrading yarn")
+        yarn_dir = ".yarn/releases/"
+        for file in os.listdir(".yarn/releases"):
+            if os.getenv("CORE_YARN_VER") in file:
+                yarn_executable = file
+
+        subprocess.run([yarn_dir + yarn_executable, "set", "version", ver], check=True)
+
+        dotenv_template_file["CORE_YARN_VER"] = ver
+        dotenv_file["CORE_YARN_VER"] = ver
+        dotenv_file.dump_to_env()
+
+        package_json_file["engines"]["yarn"] = ver
+        package_json_file.dump()
+
+        self.ground_up_containers(cache=False)
 
     def update_postgres(self, ver):
         dotenv_template_file["CORE_POSTGRES_VER"] = ver
@@ -139,6 +177,9 @@ class CLI:
         self.ground_up_containers(cache=False)
         if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
+
+    def dummy(self):
+        pass
 
 
 if __name__ == "__main__":
