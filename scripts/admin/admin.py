@@ -39,6 +39,7 @@ def _update_virtualenv_vscode_pythonpath():
 
 
 def _verify_dotenvs():
+    log.info("Verifying dotenvs compatibility")
     assert all(val == dotenv_template_file[key] for key, val in dotenv_file.data.items() if key.startswith("CORE"))
 
 
@@ -48,6 +49,7 @@ def _verify_versions():
     try:
         _verify_dotenvs()
         reference = dotenv_file
+        log.info("Verifying compatibility of core versions")
         for ver_file in verifiable_files:
             curr = ver_file
             assert ver_file.verify_core_versions()

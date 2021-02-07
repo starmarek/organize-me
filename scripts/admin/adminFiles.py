@@ -57,9 +57,8 @@ class ProjectFile:
         return f"{type(self).__name__}(path={self.path!r} name={self.name!r})"
 
 
-class VerifiableFile(ProjectFile):
-    def __init__(self, path, data_type):
-        super().__init__(path, data_type)
+class VerifiableFile:
+    def __init__(self):
         self.core_versions = {proto: os.environ[proto] for proto in self.core_versions_prototypes.keys()}
 
     def verify_core_versions(self):
@@ -76,7 +75,7 @@ class VerifiableFile(ProjectFile):
         return data
 
 
-class TomlFile(VerifiableFile):
+class TomlFile(ProjectFile):
     def __init__(self, path):
         super().__init__(path, dict)
         self._data = super().load(func=toml.load, _dict=dict)
@@ -86,7 +85,7 @@ class TomlFile(VerifiableFile):
             toml.dump(self.data, f)
 
 
-class JsonFile(VerifiableFile):
+class JsonFile(ProjectFile):
     def __init__(self, path):
         super().__init__(path, dict)
         try:
@@ -101,7 +100,7 @@ class JsonFile(VerifiableFile):
             f.write("\n")
 
 
-class YamlFile(VerifiableFile):
+class YamlFile(ProjectFile):
     def __init__(self, path):
         super().__init__(path, dict)
         self.yaml = ruamel.yaml.YAML()
@@ -130,7 +129,7 @@ class DotenvFile(ProjectFile):
         dotenv.load_dotenv(self.path, verbose=True, override=True)
 
 
-class TxtFile(VerifiableFile):
+class TxtFile(ProjectFile):
     def __init__(self, path):
         super().__init__(path, list)
         self._data = self.load()
@@ -148,46 +147,51 @@ class TxtFile(VerifiableFile):
             f.write("\n".join(str(item) for item in self.data) + "\n")
 
 
-class Pipfile(TomlFile):
+class Pipfile(TomlFile, VerifiableFile):
     def __init__(self, path):
         self.core_versions_prototypes = {
             "CORE_PYTHON_VER": ("requires", "python_version"),
         }
-        super().__init__(path)
+        TomlFile.__init__(self, path)
+        VerifiableFile.__init__(self)
 
 
-class GitlabCIFile(YamlFile):
+class GitlabCIFile(YamlFile, VerifiableFile):
     def __init__(self, path):
         self.core_versions_prototypes = {
             "CORE_PYTHON_VER": ("variables", "PYTHON_VERSION"),
             "CORE_NODE_VER": ("variables", "NODE_VERSION"),
         }
-        super().__init__(path)
+        YamlFile.__init__(self, path)
+        VerifiableFile.__init__(self)
 
 
-class DockerComposeFile(YamlFile):
+class DockerComposeFile(YamlFile, VerifiableFile):
     def __init__(self, path):
         self.core_versions_prototypes = {
             "CORE_COMPOSE_VER": ("version",),
         }
-        super().__init__(path)
+        YamlFile.__init__(self, path)
+        VerifiableFile.__init__(self)
 
 
-class PackageJsonFile(JsonFile):
+class PackageJsonFile(JsonFile, VerifiableFile):
     def __init__(self, path):
         self.core_versions_prototypes = {
             "CORE_NODE_VER": ("engines", "node"),
             "CORE_YARN_VER": ("engines", "yarn"),
         }
-        super().__init__(path)
+        JsonFile.__init__(self, path)
+        VerifiableFile.__init__(self)
 
 
-class RuntimeTxtFile(TxtFile):
+class RuntimeTxtFile(TxtFile, VerifiableFile):
     def __init__(self, path):
         self.core_versions_prototypes = {
             "CORE_PYTHON_VER": None,
         }
-        super().__init__(path)
+        TxtFile.__init__(self, path)
+        VerifiableFile.__init__(self)
 
     def get_core_version_from_file_data(self, proto):
         return self[0].split("-")[1]
