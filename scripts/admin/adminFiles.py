@@ -81,6 +81,7 @@ class TomlFile(ProjectFile):
         self._data = super().load(func=toml.load, _dict=dict)
 
     def dump(self):
+        log.info(f"Editing {self}")
         with open(self.path, "w") as f:
             toml.dump(self.data, f)
 
@@ -95,6 +96,7 @@ class JsonFile(ProjectFile):
             raise
 
     def dump(self):
+        log.info(f"Editing {self}")
         with open(self.path, "w") as f:
             json.dump(self.data, f, indent=2)
             f.write("\n")
@@ -111,6 +113,7 @@ class YamlFile(ProjectFile):
         self.yaml.indent(mapping=block_len, sequence=sequence_len, offset=block_len)
 
     def dump(self):
+        log.info(f"Editing {self}")
         with open(self.path, "w") as f:
             self.yaml.dump(self.data, f)
 
@@ -122,6 +125,7 @@ class DotenvFile(ProjectFile):
         dotenv.load_dotenv(self.path, verbose=True, override=True)
 
     def __setitem__(self, index, value):
+        log.info(f"Editing {self}")
         self.data[index] = value
         dotenv.set_key(self.path, index, value, "")
 
@@ -143,6 +147,7 @@ class TxtFile(ProjectFile):
             return None
 
     def dump(self):
+        log.info(f"Editing {self}")
         with open(self.path, "w") as f:
             f.write("\n".join(str(item) for item in self.data) + "\n")
 

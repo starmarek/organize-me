@@ -83,6 +83,7 @@ class CLI:
         self.ground_up_containers(cache=False)
 
     def update_python(self, ver):
+        log.info("Reinstalling your pipenv")
         subprocess.run(["pipenv", "--rm"], check=True)
         pipfile_file["requires"]["python_version"] = ver
         pipfile_file.dump()
