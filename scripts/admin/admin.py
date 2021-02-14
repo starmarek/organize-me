@@ -23,6 +23,10 @@ from .adminFiles import (
 log = logging.getLogger("admin")
 coloredlogs.install(level="DEBUG")
 
+yarn_dir = ".yarn/releases/"
+for file in os.listdir(".yarn/releases"):
+    if os.getenv("CORE_YARN_VER") in file:
+        yarn_executable = file
 
 dotenv_file = DotenvFile(path=".env")
 compose_file = DockerComposeFile(path="docker-compose.yml")
@@ -92,10 +96,6 @@ class CLI:
 
     def update_yarn(self, ver):
         log.info("Upgrading yarn")
-        yarn_dir = ".yarn/releases/"
-        for file in os.listdir(".yarn/releases"):
-            if os.getenv("CORE_YARN_VER") in file:
-                yarn_executable = file
 
         subprocess.run([yarn_dir + yarn_executable, "set", "version", ver], check=True)
 
@@ -178,8 +178,25 @@ class CLI:
         if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
-    def dummy(self):
-        pass
+    def install_pip(self, package, dev):
+        subprocess.run(["pipenv", "install", package, "--dev" if dev else ""], check=True)
+
+        self.ground_up_containers(cache=False)
+
+    def install_node(self, package, dev):
+        subprocess.run(["sudo", yarn_dir + yarn_executable, "add", package, "--dev" if dev else ""], check=True)
+
+        self.ground_up_containers(cache=False)
+
+    def remove_pip(self, package):
+        subprocess.run(["pipenv", "uninstall", package], check=True)
+
+        self.ground_up_containers(cache=False)
+
+    def remove_node(self, package):
+        subprocess.run(["sudo", yarn_dir + yarn_executable, "remove", package], check=True)
+
+        self.ground_up_containers(cache=False)
 
 
 if __name__ == "__main__":
