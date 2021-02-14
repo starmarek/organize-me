@@ -106,14 +106,14 @@ class CLI:
         package_json_file["engines"]["yarn"] = ver
         package_json_file.dump()
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
     def update_postgres(self, ver):
         dotenv_template_file["CORE_POSTGRES_VER"] = ver
         dotenv_file["CORE_POSTGRES_VER"] = ver
         dotenv_file.dump_to_env()
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
     def update_compose(self, ver):
         ver = str(ver)
@@ -125,7 +125,7 @@ class CLI:
         compose_file["version"] = ver
         compose_file.dump()
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
     def update_python(self, ver):
         log.info("Reinstalling your pipenv")
@@ -137,7 +137,7 @@ class CLI:
         dotenv_template_file["CORE_PYTHON_VER"] = ver
         dotenv_file["CORE_PYTHON_VER"] = ver
         dotenv_file.dump_to_env()
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
         gitlab_ci_file["variables"]["PYTHON_VERSION"] = ver
         gitlab_ci_file.dump()
@@ -153,7 +153,7 @@ class CLI:
         dotenv_file["CORE_NODE_VER"] = ver
         dotenv_file.dump_to_env()
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
         gitlab_ci_file["variables"]["NODE_VERSION"] = ver
         gitlab_ci_file.dump()
@@ -161,42 +161,48 @@ class CLI:
         package_json_file["engines"]["node"] = ver
         package_json_file.dump()
 
-    def build_containers(self, cache=True):
+    def containers_build(self, cache=True):
         log.info(f"Building containers with 'cache={cache}'")
         subprocess.run(shlex.split(f"docker-compose build --force-rm {'' if cache else '--no-cache'}"), check=True)
 
-    def run_containers(self):
+    def containers_logs(self, container_name=""):
+        try:
+            subprocess.run(shlex.split(f"docker-compose logs -f {container_name}"))
+        except KeyboardInterrupt:
+            pass
+
+    def containers_up(self):
         log.info("Running containers")
         subprocess.run(shlex.split("docker-compose up --detach --remove-orphans --force-recreate"), check=True)
 
-    def ground_up_containers(self, cache=True):
+    def containers_ground_up(self, cache=True):
         self.build_containers(cache=cache)
-        self.run_containers()
+        self.containers_up()
 
     def init(self):
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
         if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
     def install_pip(self, package, dev):
         subprocess.run(["pipenv", "install", package, "--dev" if dev else ""], check=True)
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
-    def install_node(self, package, dev):
+    def install_yarn(self, package, dev):
         subprocess.run(["sudo", yarn_dir + yarn_executable, "add", package, "--dev" if dev else ""], check=True)
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
     def remove_pip(self, package):
         subprocess.run(["pipenv", "uninstall", package], check=True)
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
-    def remove_node(self, package):
+    def remove_yarn(self, package):
         subprocess.run(["sudo", yarn_dir + yarn_executable, "remove", package], check=True)
 
-        self.ground_up_containers(cache=False)
+        self.containers_ground_up(cache=False)
 
 
 if __name__ == "__main__":
