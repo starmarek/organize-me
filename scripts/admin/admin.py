@@ -176,7 +176,7 @@ class CLI:
         subprocess.run(shlex.split("docker-compose up --detach --remove-orphans --force-recreate"), check=True)
 
     def containers_ground_up(self, cache=True):
-        self.build_containers(cache=cache)
+        self.containers_build(cache=cache)
         self.containers_up()
 
     def init(self):
