@@ -1,39 +1,87 @@
 <template>
-    <div id="app">
-        <div id="header">
-            <h1>Organize-me <i class="fa fa-hospital-o" aria-hidden="true" /></h1>
-            <h4>Szybkie i wygodnie ustalanie grafiku!</h4>
-        </div>
-
-        <div id="section">
-            <div id="nav">
-                <ul>
-                    <li><router-link :to="{ name: 'home' }">Home</router-link></li>
-                    <li>
-                        <router-link :to="{ name: 'messages' }"
-                            >Django Rest</router-link
-                        >
-                    </li>
-                </ul>
-            </div>
-
-            <div id="main">
-                <router-view />
-            </div>
-        </div>
-
-        <div id="footer">
-            <p>Footer</p>
-        </div>
+  <div class="app content">
+    <Navbar />
+    <div class="main container">
+      <router-view />
     </div>
+  </div>
 </template>
 
-<style>
-#app {
-    font-family: "Avenir", Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-}
-@import "styles/main.css";
+<script>
+import Navbar from "@/components/layout/Navbar.vue";
+export default {
+  name: "App",
+  components: {
+    Navbar,
+  },
+};
+</script>
+
+<style lang="scss">
+  // CUSTOM
+  body {
+    height: 100vh;
+  }
+
+  .main {
+    padding: 20pt 10pt 20pt 10pt;
+  }
+
+  // BULMA
+  @import "~bulma/sass/utilities/_all";
+
+  $primary: #227c9d;
+  $primary-invert: findColorInvert($primary);
+  $secondary: #ffcb77;
+  $secondary-invert: findColorInvert($secondary);
+
+  $colors: (
+    "white": (
+      $white,
+      $black,
+    ),
+    "black": (
+      $black,
+      $white,
+    ),
+    "light": (
+      $light,
+      $light-invert,
+    ),
+    "dark": (
+      $dark,
+      $dark-invert,
+    ),
+    "primary": (
+      $primary,
+      $primary-invert,
+    ),
+    "secondary": (
+      $secondary,
+      $secondary-invert,
+    ),
+    "info": (
+      $info,
+      $info-invert,
+    ),
+    "success": (
+      $success,
+      $success-invert,
+    ),
+    "warning": (
+      $warning,
+      $warning-invert,
+    ),
+    "danger": (
+      $danger,
+      $danger-invert,
+    ),
+  );
+
+  $link: $primary;
+  $link-invert: $primary-invert;
+  $link-focus-border: $primary;
+
+  @import "~bulma";
+  @import "~buefy/src/scss/buefy";
 </style>
