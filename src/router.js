@@ -8,26 +8,26 @@ import UsersCreation from "@/components/user/UsersCreation.vue";
 Vue.use(Router);
 
 export default new Router({
-  routes: [
-    {
-      path: "/",
-      name: "home",
-      component: Home,
-    },
-    {
-      path: "/messages",
-      name: "messages",
-      component: Messages,
-    },
-    {
-      path: "/users",
-      name: "users-dashboard",
-      component: UsersDashboard,
-    },
-    {
-      path: "/users/creation",
-      name: "users-creation",
-      component: UsersCreation,
-    },
-  ],
+    routes: [
+        {
+            path: "/",
+            name: "home",
+            component: Home,
+        },
+        {
+            path: "/messages",
+            name: "messages",
+            component: Messages,
+        },
+        {
+            path: "/users",
+            name: "users-dashboard",
+            component: UsersDashboard,
+        },
+        {
+            path: "/users/creation",
+            name: "users-creation",
+            component: UsersCreation,
+        },
+    ],
 });

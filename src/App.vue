@@ -1,87 +1,87 @@
 <template>
-  <div class="app content">
-    <Navbar />
-    <div class="main container">
-      <router-view />
+    <div class="app content">
+        <Navbar />
+        <div class="main container">
+            <router-view />
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
 import Navbar from "@/components/layout/Navbar.vue";
 export default {
-  name: "App",
-  components: {
-    Navbar,
-  },
+    name: "App",
+    components: {
+        Navbar,
+    },
 };
 </script>
 
 <style lang="scss">
-  // CUSTOM
-  body {
+// CUSTOM
+body {
     height: 100vh;
-  }
+}
 
-  .main {
+.main {
     padding: 20pt 10pt 20pt 10pt;
-  }
+}
 
-  // BULMA
-  @import "~bulma/sass/utilities/_all";
+// BULMA
+@import "~bulma/sass/utilities/_all";
 
-  $primary: #227c9d;
-  $primary-invert: findColorInvert($primary);
-  $secondary: #ffcb77;
-  $secondary-invert: findColorInvert($secondary);
+$primary: #227c9d;
+$primary-invert: findColorInvert($primary);
+$secondary: #ffcb77;
+$secondary-invert: findColorInvert($secondary);
 
-  $colors: (
+$colors: (
     "white": (
-      $white,
-      $black,
+        $white,
+        $black,
     ),
     "black": (
-      $black,
-      $white,
+        $black,
+        $white,
     ),
     "light": (
-      $light,
-      $light-invert,
+        $light,
+        $light-invert,
     ),
     "dark": (
-      $dark,
-      $dark-invert,
+        $dark,
+        $dark-invert,
     ),
     "primary": (
-      $primary,
-      $primary-invert,
+        $primary,
+        $primary-invert,
     ),
     "secondary": (
-      $secondary,
-      $secondary-invert,
+        $secondary,
+        $secondary-invert,
     ),
     "info": (
-      $info,
-      $info-invert,
+        $info,
+        $info-invert,
     ),
     "success": (
-      $success,
-      $success-invert,
+        $success,
+        $success-invert,
     ),
     "warning": (
-      $warning,
-      $warning-invert,
+        $warning,
+        $warning-invert,
     ),
     "danger": (
-      $danger,
-      $danger-invert,
+        $danger,
+        $danger-invert,
     ),
-  );
+);
 
-  $link: $primary;
-  $link-invert: $primary-invert;
-  $link-focus-border: $primary;
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
 
-  @import "~bulma";
-  @import "~buefy/src/scss/buefy";
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
 </style>
