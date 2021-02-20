@@ -126,12 +126,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "dist", "static")
 STATICFILES_DIRS = []
 
 
-##########
-# STATIC #
-##########
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Insert Whitenoise Middleware at top but below Security Middleware
-# MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware',)
-# http://whitenoise.evans.io/en/stable/django.html#make-sure-staticfiles-is-configured-correctly
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+}
