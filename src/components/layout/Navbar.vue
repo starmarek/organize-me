@@ -19,10 +19,9 @@
         <template slot="end">
             <b-navbar-item tag="div">
                 <div class="buttons">
-                    <a class="button is-secondary">
-                        <strong>Sign up</strong>
-                    </a>
-                    <a class="button is-light">Log in</a>
+                    <b-button tag="router-link" to="/login" type="is-light"
+                        >Sign in</b-button
+                    >
                 </div>
             </b-navbar-item>
         </template>
@@ -35,3 +34,8 @@ export default {
     name: "Navbar",
 };
 </script>
+<style>
+.navbar {
+    height: 5vh;
+}
+</style>

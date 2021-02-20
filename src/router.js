@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Home from "@/components/Home";
 import Messages from "@/components/Messages";
 import UsersDashboard from "@/components/user/UsersDashboard.vue";
+import Login from "@/components/layout/Login.vue";
 import UsersCreation from "@/components/user/UsersCreation.vue";
 
 Vue.use(Router);
@@ -13,6 +14,11 @@ export default new Router({
             path: "/",
             name: "home",
             component: Home,
+        },
+        {
+            path: "/login",
+            name: "login",
+            component: Login,
         },
         {
             path: "/messages",
