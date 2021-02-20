@@ -4,6 +4,7 @@ db.sqlite3
 /dist
 /venv
 __pycache__
+*.rest
 
 # env files
 .env.local
