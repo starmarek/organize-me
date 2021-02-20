@@ -930,6 +930,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-free@npm:^5.15.2":
+  version: 5.15.2
+  resolution: "@fortawesome/fontawesome-free@npm:5.15.2"
+  checksum: 4f189f7474f28122a4173a344cb9c527b38dc8ecabcfe2eab2af60187679782426e37937afa282cc0d29dd0bd75e0b117d303d8f3491e41b828046f9648b93f5
+  languageName: node
+  linkType: hard
+
 "@hapi/address@npm:2.x.x":
   version: 2.1.4
   resolution: "@hapi/address@npm:2.1.4"
@@ -3704,6 +3711,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "django-vue@workspace:."
   dependencies:
+    "@fortawesome/fontawesome-free": ^5.15.2
     "@vue/cli-plugin-babel": ^3.0.0-rc.12
     "@vue/cli-service": ^3.0.0-rc.12
     axios: ^0.18.0

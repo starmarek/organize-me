@@ -2,8 +2,8 @@
     <b-navbar class="is-primary">
         <template slot="brand">
             <b-navbar-item tag="router-link" :to="{ path: '/' }">
+            <b-icon icon="hospital"></b-icon>
                 ORGANIZE-ME
-                <i class="fa fa-hospital-o" aria-hidden="true" />
             </b-navbar-item>
         </template>
         <template slot="start">
