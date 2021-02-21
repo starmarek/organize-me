@@ -3,11 +3,19 @@
         <form @submit.prevent="login">
             <div class="columns">
                 <div class="column box" style="margin-bottom: 5vh">
-                    <b-field label="Username">
-                        <b-input v-model="username"></b-input>
+                    <b-field
+                        :type="wrongCredentialsProvided ? 'is-danger' : ''"
+                        :message="
+                            wrongCredentialsProvided
+                                ? 'The email or password is incorrect.'
+                                : ''
+                        "
+                        label="Username"
+                    >
+                        <b-input v-model="username" required></b-input>
                     </b-field>
                     <b-field label="Password">
-                        <b-input password-reveal v-model="password"></b-input>
+                        <b-input required password-reveal v-model="password"></b-input>
                     </b-field>
                     <div class="has-text-centered">
                         <b-button expanded native-type="submit" type="is-warning">
@@ -26,6 +34,7 @@ export default {
     name: "Login",
     data() {
         return {
+            wrongCredentialsProvided: false,
             username: "",
             password: "",
         };
@@ -36,7 +45,23 @@ export default {
             this.getTokenPair({
                 username: this.username,
                 password: this.password,
-            });
+            })
+                .then(() => {
+                    this.$router.push("/");
+                })
+                .catch((err) => {
+                    if (err.response.status == 401) {
+                        this.wrongCredentialsProvided = true;
+                    } else if (err.response.status == 500) {
+                        this.$buefy.notification.open({
+                            duration: 8000,
+                            message: `Request failed with status <b>500</b>. Please try again in a moment. Otherwise contact administrator.`,
+                            position: "is-bottom-right",
+                            type: "is-danger",
+                            hasIcon: true,
+                        });
+                    }
+                });
         },
     },
     computed: {

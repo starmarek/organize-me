@@ -6,9 +6,10 @@ import UsersDashboard from "@/components/user/UsersDashboard.vue";
 import Login from "@/components/layout/Login.vue";
 import UsersCreation from "@/components/user/UsersCreation.vue";
 
-import store from "@/store"; // your vuex store
+import store from "@/store";
 
 Vue.use(Router);
+
 const ifNotAuthenticated = (to, from, next) => {
     if (!store.getters["auth/isAuthenticated"]) {
         next();
