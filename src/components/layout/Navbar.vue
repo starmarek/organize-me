@@ -19,8 +19,15 @@
         <template slot="end">
             <b-navbar-item tag="div">
                 <div class="buttons">
-                    <b-button tag="router-link" to="/login" type="is-light"
+                    <b-button
+                        v-if="!isAuthenticated"
+                        tag="router-link"
+                        to="/login"
+                        type="is-light"
                         >Sign in</b-button
+                    >
+                    <b-button @click="logout" v-if="isAuthenticated" type="is-light"
+                        >Logout</b-button
                     >
                 </div>
             </b-navbar-item>
@@ -30,8 +37,20 @@
 </template>
 
 <script>
+import { mapMutations, mapGetters } from "vuex";
+
 export default {
     name: "Navbar",
+    computed: {
+        ...mapGetters("auth", ["isAuthenticated"]),
+    },
+    methods: {
+        ...mapMutations("auth", ["removeTokens"]),
+        logout() {
+            this.removeTokens();
+            this.$router.push("/");
+        },
+    },
 };
 </script>
 <style>

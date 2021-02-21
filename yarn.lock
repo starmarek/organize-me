@@ -3713,6 +3713,7 @@ __metadata:
     eslint-config-prettier: ^7.1.0
     eslint-plugin-vue: ^7.4.0
     js-cookie: ^2.2.0
+    jwt-decode: ^3.1.2
     node-sass: ^4.14.1
     prettier: ^2.2.1
     sass: ^1.26.10
@@ -6356,6 +6357,13 @@ fsevents@~2.3.1:
     json-schema: 0.2.3
     verror: 1.10.0
   checksum: ee0177b7ef39e6becf18c586d31fabe15d62be88e7867d3aff86466e4a3de9a2cd47b6e597417aebc1cd3c2d43bc662e79ab5eecdadf3ce0643e909432ed6d2c
+  languageName: node
+  linkType: hard
+
+"jwt-decode@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "jwt-decode@npm:3.1.2"
+  checksum: 144712f200e4ad87d8550f614cb40017b1e6f20b6b105b4184ddbd076566e85e13a015ae1af7fc85ace03768eabe5e0863fa79cb6349adea8396f9f729a93213
   languageName: node
   linkType: hard
 
