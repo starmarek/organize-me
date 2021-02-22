@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
     name: "Navbar",
@@ -45,9 +45,9 @@ export default {
         ...mapGetters("auth", ["isAuthenticated"]),
     },
     methods: {
-        ...mapMutations("auth", ["removeTokens"]),
+        ...mapActions("auth", ["endAuthSession"]),
         logout() {
-            this.removeTokens();
+            this.endAuthSession();
             if (this.$route.path != "/") {
                 this.$router.push("/");
             }

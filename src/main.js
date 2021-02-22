@@ -6,15 +6,19 @@ import router from "@/router";
 
 import Buefy from "buefy";
 
-import api from "@/services/api";
-
 Vue.use(Buefy);
 
 Vue.config.productionTip = false;
 
-const token = localStorage.getItem("accessToken");
-if (token) {
-    api.defaults.headers.common["Authorization"] = "Bearer " + token;
+// handle auth when user open / refresh the app
+if (store.getters["auth/isAuthenticated"]) {
+    if (store.getters["auth/isAccessTokenExpired"]) {
+        store.dispatch("auth/endAuthSession", true);
+        router.push("/login");
+    } else {
+        store.dispatch("auth/refreshAccessToken");
+        store.dispatch("auth/startTokenRefreshCounter");
+    }
 }
 
 const vue = new Vue({
