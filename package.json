@@ -15,8 +15,8 @@
     "check-eslint-config": "eslint-config-prettier src/main.js"
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "buefy": "^0.8.20",
+    "axios": "^0.21.1",
+    "buefy": "^0.9.4",
     "js-cookie": "^2.2.0",
     "jwt-decode": "^3.1.2",
     "node-sass": "^4.14.1",
