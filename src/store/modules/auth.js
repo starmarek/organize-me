@@ -34,8 +34,6 @@ const actions = {
                     api.defaults.headers.common["Authorization"] =
                         "Bearer " + response.data.access;
                     dispatch("startTokenRefreshCounter");
-                    console.log("getFreshPair");
-                    console.log(response.data.access);
                     resolve();
                 })
                 .catch((err) => {
@@ -51,8 +49,6 @@ const actions = {
                     commit("setAccessToken", response.data.access);
                     api.defaults.headers.common["Authorization"] =
                         "Bearer " + response.data.access;
-                    console.log("refresh_access");
-                    console.log(response.data.access);
                     resolve();
                 })
                 .catch((err) => {
@@ -72,7 +68,6 @@ const actions = {
     },
     endAuthSession({ commit, getters }, notification = false) {
         commit("removeTokens");
-        console.log("endAuth");
         delete api.defaults.headers.common["Authorization"];
         const ID = getters.refreshTokenCounterID;
         if (ID != "") {
