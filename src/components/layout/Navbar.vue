@@ -26,9 +26,7 @@
                         type="is-light"
                         >Sign in</b-button
                     >
-                    <b-button @click="logout" v-if="isAuthenticated" type="is-light"
-                        >Logout</b-button
-                    >
+                    <b-button @click="logout" v-else type="is-light">Logout</b-button>
                 </div>
             </b-navbar-item>
         </template>
