@@ -55,8 +55,9 @@ def _update_virtualenv_vscode_pythonpath():
 
 
 def _install_pre_commit():
-    log.info("Installing pre-commit hook")
+    log.info("Installing pre-commit hooks")
     subprocess.run(shlex.split(f"{virtualenv_path}/bin/pre-commit install"), check=True)
+    log.warning("You need to install shfmt and shellcheck on your computer in order to pre-commit hooks to work.")
 
 
 def _verify_dotenvs():
@@ -186,7 +187,7 @@ class CLI:
         self.containers_up()
 
     def init(self):
-        # self.containers_ground_up(cache=False)
+        self.containers_ground_up(cache=False)
         _install_pre_commit()
         if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
