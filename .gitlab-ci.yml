@@ -2,7 +2,6 @@ stages:
     - build
     - test
     - deploy
-    - post
 
 variables:
     # do not change those by hand!
@@ -51,30 +50,6 @@ install_node:
             - node_modules/
         expire_in: 1 day
 
-create_badge_svg:
-    image: python:$PYTHON_VERSION
-    stage: post
-    dependencies: []
-    script:
-        - echo "Badges creating"
-    after_script:
-        - pip install anybadge
-        - commits=$(git rev-list  `git rev-list --tags --no-walk --max-count=1`..HEAD --count)
-        - anybadge -l "commits after tag" -v $commits -f commits.svg -u 5=green 10=orange 20=red
-        - py_lines=$(( find backend -name '*.py' -print0 | xargs -0 cat ) | wc -l)
-        - anybadge -l "python lines" -v $py_lines -f py_lines.svg -c teal
-        - anybadge --label=awesomeness --value="110%" --file=awesomeness.svg --color=#97CA00
-    artifacts:
-        paths:
-            - commits.svg
-            - py_lines.svg
-            - awesomeness.svg
-    only:
-        - master
-    except:
-        - tags
-    allow_failure: true
-
 prettier:
     <<: *node_formatter_linter_jobs_base
     script:
@@ -101,6 +76,20 @@ isort:
     <<: *python_formatter_linter_jobs_base
     script:
         - pipenv run isort . --check
+
+shellcheck:
+    image: koalaman/shellcheck-alpine:stable
+    stage: test
+    dependencies: []
+    script:
+        - shellcheck $(find . -name *.sh)
+
+shfmt:
+    image: mvdan/shfmt:v3.2.2-alpine
+    stage: test
+    dependencies: []
+    script:
+        - shfmt -i 4 -ci -d $(find . -name *.sh)
 
 heroku:
     image: ruby:3.0.0

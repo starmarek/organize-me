@@ -1,0 +1,44 @@
+repos:
+    # - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    #   rev: 2.1.2
+    #   hooks:
+    #       - id: shellcheck
+    #         name: shellcheck
+    - repo: local
+      hooks:
+          - id: black
+            name: black
+            stages: [commit]
+            entry: pipenv run black  --check
+            language: system
+            types: [python]
+          - id: shfmt
+            name: shfmt
+            stages: [commit]
+            entry: shfmt -i 4 -ci -d
+            language: system
+            types: [shell]
+          - id: flake8
+            name: flake8
+            stages: [commit]
+            entry: pipenv run flake8
+            language: system
+            types: [python]
+          - id: isort
+            name: isort
+            stages: [commit]
+            entry: pipenv run isort --check
+            language: system
+            types: [python]
+          - id: eslint
+            name: eslint
+            stages: [commit]
+            entry: yarn eslint
+            language: system
+            types_or: [javascript, vue]
+          - id: prettier
+            name: prettier
+            stages: [commit]
+            entry: yarn prettier -c
+            language: system
+            types_or: [javascript, vue, yaml]
