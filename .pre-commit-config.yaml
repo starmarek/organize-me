@@ -1,9 +1,4 @@
 repos:
-    # - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    #   rev: 2.1.2
-    #   hooks:
-    #       - id: shellcheck
-    #         name: shellcheck
     - repo: local
       hooks:
           - id: black
@@ -12,6 +7,12 @@ repos:
             entry: pipenv run black  --check
             language: system
             types: [python]
+          - id: shellcheck
+            name: shellcheck
+            stages: [commit]
+            entry: shellcheck
+            language: system
+            types: [shell]
           - id: shfmt
             name: shfmt
             stages: [commit]

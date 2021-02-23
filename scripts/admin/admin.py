@@ -28,6 +28,8 @@ for file in os.listdir(".yarn/releases"):
     if os.getenv("CORE_YARN_VER") in file:
         yarn_executable = file
 
+virtualenv_path = subprocess.run(["pipenv", "--venv"], capture_output=True, text=True, check=True).stdout.strip()
+
 dotenv_file = DotenvFile(path=".env")
 compose_file = DockerComposeFile(path="docker-compose.yml")
 dotenv_template_file = DotenvFile(path=".template.env")
@@ -41,7 +43,6 @@ verifiable_files = [compose_file, gitlab_ci_file, pipfile_file, runtime_txt_file
 
 def _update_virtualenv_vscode_pythonpath():
     settings_file = JsonFile(path=".vscode/settings.json")
-    virtualenv_path = subprocess.run(["pipenv", "--venv"], capture_output=True, text=True, check=True).stdout.strip()
 
     Path(settings_file.path.split("/")[-2]).mkdir(exist_ok=True)
     if Path(settings_file.path).exists():
@@ -51,6 +52,11 @@ def _update_virtualenv_vscode_pythonpath():
         settings_file.data = json.loads(json.dumps({"python.pythonPath": f"{virtualenv_path}/bin/python"}))
         settings_file.dump()
     log.info(f"Setting vscode pythonpath to '{virtualenv_path}/bin/python'")
+
+
+def _install_pre_commit():
+    log.info("Installing pre-commit hook")
+    subprocess.run(shlex.split(f"{virtualenv_path}/bin/pre-commit install"), check=True)
 
 
 def _verify_dotenvs():
@@ -180,7 +186,8 @@ class CLI:
         self.containers_up()
 
     def init(self):
-        self.containers_ground_up(cache=False)
+        # self.containers_ground_up(cache=False)
+        _install_pre_commit()
         if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
