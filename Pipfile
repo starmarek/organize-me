@@ -21,6 +21,7 @@ python-dotenv = "*"
 fire = "*"
 toml = "*"
 "ruamel.yaml" = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.9.1"
