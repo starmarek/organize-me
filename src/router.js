@@ -10,52 +10,59 @@ import store from "@/store";
 
 Vue.use(Router);
 
-const ifNotAuthenticated = (to, from, next) => {
-    if (!store.getters["auth/isAuthenticated"]) {
-        next();
-        return;
-    }
-    next("/");
-};
-
-const ifAuthenticated = (to, from, next) => {
-    if (store.getters["auth/isAuthenticated"]) {
-        next();
-        return;
-    }
-    next("/login");
-};
-
-export default new Router({
+const router = new Router({
     routes: [
         {
             path: "/",
             name: "home",
             component: Home,
+            meta: { requiresAuth: false, requiresNoAuth: false },
         },
         {
             path: "/login",
             name: "login",
             component: Login,
-            beforeEnter: ifNotAuthenticated,
+            meta: { requiresAuth: false, requiresNoAuth: true },
         },
         {
             path: "/messages",
             name: "messages",
             component: Messages,
-            beforeEnter: ifAuthenticated,
+            meta: { requiresAuth: true, requiresNoAuth: false },
         },
         {
             path: "/users",
             name: "users-dashboard",
             component: UsersDashboard,
-            beforeEnter: ifAuthenticated,
+            meta: { requiresAuth: true, requiresNoAuth: false },
         },
         {
             path: "/users/creation",
             name: "users-creation",
             component: UsersCreation,
-            beforeEnter: ifAuthenticated,
+            meta: { requiresAuth: true, requiresNoAuth: false },
         },
     ],
+    scrollBehavior() {
+        return { x: 0, y: 0 };
+    },
+});
+export default router;
+
+router.beforeEach((to, from, next) => {
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (store.getters["auth/isAuthenticated"]) {
+            next();
+        } else {
+            next("/login");
+        }
+    } else if (to.matched.some((record) => record.meta.requiresNoAuth)) {
+        if (!store.getters["auth/isAuthenticated"]) {
+            next();
+        } else {
+            next("/");
+        }
+    } else {
+        next();
+    }
 });
