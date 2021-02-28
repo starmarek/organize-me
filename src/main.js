@@ -12,6 +12,7 @@ Vue.config.productionTip = false;
 
 // handle auth when user open / refresh the app
 if (store.getters["auth/isAuthenticated"]) {
+    store.dispatch("auth/setAxiosHeaders");
     if (store.getters["auth/isAccessTokenExpired"]) {
         store.dispatch("auth/endAuthSession", true);
         router.push("/login");

@@ -1,5 +1,6 @@
 import api from "@/services/api";
 import { NotificationProgrammatic as Notification } from "buefy";
+import authService from "../../services/authService";
 import jwt_decode from "jwt-decode";
 
 const state = {
@@ -28,11 +29,11 @@ const getters = {
 const actions = {
     getTokenPair({ dispatch }, credentials) {
         return new Promise((resolve, reject) => {
-            api.post("token/", credentials)
-                .then((response) => {
-                    dispatch("setTokens", response.data);
-                    api.defaults.headers.common["Authorization"] =
-                        "Bearer " + response.data.access;
+            authService
+                .fetchTokens(credentials)
+                .then((data) => {
+                    dispatch("setTokens", data);
+                    dispatch("setAxiosHeaders");
                     dispatch("startTokenRefreshCounter");
                     resolve();
                 })
@@ -41,20 +42,25 @@ const actions = {
                 });
         });
     },
-    refreshAccessToken({ commit, getters }) {
+    refreshAccessToken({ commit, getters, dispatch }) {
         return new Promise((resolve, reject) => {
-            delete api.defaults.headers.common["Authorization"];
-            api.post("token/refresh/", { refresh: getters.refreshToken })
-                .then((response) => {
-                    commit("setAccessToken", response.data.access);
-                    api.defaults.headers.common["Authorization"] =
-                        "Bearer " + response.data.access;
+            authService
+                .fetchRefreshedAccessToken(getters.refreshToken)
+                .then((data) => {
+                    commit("setAccessToken", data.access);
+                    dispatch("setAxiosHeaders");
                     resolve();
                 })
                 .catch((err) => {
                     reject(err);
                 });
         });
+    },
+    setAxiosHeaders({ getters }) {
+        api.defaults.headers.common["Authorization"] = "Bearer " + getters.accessToken;
+    },
+    removeAxiosHeaders() {
+        delete api.defaults.headers.common["Authorization"];
     },
     setTokens({ commit }, data) {
         commit("setAccessToken", data.access);
@@ -66,13 +72,18 @@ const actions = {
         }, 10000);
         commit("setTokenRefreshCounterID", ID);
     },
-    endAuthSession({ commit, getters }, notification = false) {
+    endAuthSession({ commit, getters, dispatch }, notification = false) {
         commit("removeTokens");
-        delete api.defaults.headers.common["Authorization"];
+        dispatch("removeAxiosHeaders");
+
         const ID = getters.refreshTokenCounterID;
+        // when user refresh the page, and the token is expired
+        // refreshTokenCounter won't be active, i.e. ID == ""
+        // but when user explicitly log out, refreshTokenCounter will be active
         if (ID != "") {
             clearInterval(ID);
         }
+
         if (notification) {
             Notification.open({
                 duration: 8000,
