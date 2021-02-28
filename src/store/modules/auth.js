@@ -1,4 +1,4 @@
-import api from "@/services/api";
+import { api } from "@/services/api";
 import { NotificationProgrammatic as Notification } from "buefy";
 import authService from "../../services/authService";
 import jwt_decode from "jwt-decode";
