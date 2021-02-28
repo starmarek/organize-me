@@ -4,6 +4,7 @@ import App from "@/App.vue";
 import store from "@/store";
 import router from "@/router";
 
+import { NotificationProgrammatic as Notification } from "buefy";
 import Buefy from "buefy";
 
 Vue.use(Buefy);
@@ -17,8 +18,22 @@ if (store.getters["auth/isAuthenticated"]) {
         store.dispatch("auth/endAuthSession", true);
         router.push("/login");
     } else {
-        store.dispatch("auth/refreshAccessToken");
-        store.dispatch("auth/startTokenRefreshCounter");
+        store
+            .dispatch("auth/refreshAccessToken")
+            .then(() => {
+                store.dispatch("auth/startTokenRefreshCounter");
+            })
+            .catch(() => {
+                Notification.open({
+                    duration: 8000,
+                    message: `Refresh auth error. This should have never happened. Please sign in again. Please report this to administrator.`,
+                    position: "is-top-right",
+                    type: "is-danger",
+                    hasIcon: true,
+                });
+                store.dispatch("auth/endAuthSession");
+                router.push("/login");
+            });
     }
 }
 

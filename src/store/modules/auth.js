@@ -2,6 +2,7 @@ import api from "@/services/api";
 import { NotificationProgrammatic as Notification } from "buefy";
 import authService from "../../services/authService";
 import jwt_decode from "jwt-decode";
+import router from "@/router";
 
 const state = {
     accessToken: localStorage.getItem("accessToken"),
@@ -68,7 +69,17 @@ const actions = {
     },
     startTokenRefreshCounter({ dispatch, commit }) {
         const ID = setInterval(() => {
-            dispatch("refreshAccessToken");
+            dispatch("refreshAccessToken").catch(() => {
+                dispatch("endAuthSession");
+                router.push("/login");
+                Notification.open({
+                    duration: 8000,
+                    message: `Refresh auth error. This should have never happened. Please sign in again. Please report this to administrator.`,
+                    position: "is-top-right",
+                    type: "is-danger",
+                    hasIcon: true,
+                });
+            });
         }, 10000);
         commit("setTokenRefreshCounterID", ID);
     },

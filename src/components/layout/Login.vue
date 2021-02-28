@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 export default {
     name: "Login",
     data() {
@@ -48,29 +48,29 @@ export default {
             })
                 .then(() => {
                     this.$router.push("/");
+                    this.$buefy.notification.open({
+                        duration: 8000,
+                        message: `Successfull login!`,
+                        position: "is-top-right",
+                        type: "is-success",
+                        hasIcon: true,
+                    });
                 })
                 .catch((err) => {
                     if (err.response.status == 401) {
+                        this.password = "";
                         this.wrongCredentialsProvided = true;
-                    } else if (err.response.status == 500) {
+                    } else {
                         this.$buefy.notification.open({
                             duration: 8000,
-                            message: `Request failed with status <b>500</b>. Please try again in a moment. Otherwise contact administrator.`,
-                            position: "is-bottom-right",
+                            message: `Request failed with status <b>${err.response.status}</b>. Please try again in a moment. Otherwise contact administrator.`,
+                            position: "is-top-right",
                             type: "is-danger",
                             hasIcon: true,
                         });
                     }
                 });
         },
-    },
-    computed: {
-        ...mapGetters("auth", [
-            "accessToken",
-            "refreshToken",
-            "accessTokenDecoded",
-            "refreshTokenDecoded",
-        ]),
     },
 };
 </script>
