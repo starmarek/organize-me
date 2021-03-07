@@ -3,7 +3,7 @@ import Router from "vue-router";
 import Home from "@/components/Home";
 import Messages from "@/components/Messages";
 import UsersDashboard from "@/components/user/UsersDashboard.vue";
-import Login from "@/components/layout/Login.vue";
+import Login from "@/components/Login.vue";
 import UsersCreation from "@/components/user/UsersCreation.vue";
 
 import store from "@/store";

@@ -25,6 +25,7 @@ const getters = {
         }
     },
     refreshTokenCounterID: (state) => state.refreshTokenCounterID,
+    authUser: (state, getters) => getters.accessTokenDecoded.user,
 };
 
 const actions = {
