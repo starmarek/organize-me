@@ -12,4 +12,11 @@ export default {
             })
             .then((response) => response.data);
     },
+    logoutUser(refreshToken) {
+        return api
+            .post("logout/", {
+                refresh: refreshToken,
+            })
+            .then((response) => response.data);
+    },
 };

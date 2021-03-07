@@ -81,10 +81,19 @@ const actions = {
                     hasIcon: true,
                 });
             });
-        }, 10000);
+        }, 3600000);
         commit("setTokenRefreshCounterID", ID);
     },
     endAuthSession({ commit, getters, dispatch }, notification = false) {
+        authService.logoutUser(getters.refreshToken).catch((err) => {
+            Notification.open({
+                duration: 8000,
+                message: `There was ${err.response.status} error while logging you out. Please report this to administrator.`,
+                position: "is-top-left",
+                type: "is-warning",
+                hasIcon: true,
+            });
+        });
         commit("removeTokens");
         dispatch("removeAxiosHeaders");
 
