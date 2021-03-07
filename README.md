@@ -28,6 +28,48 @@ The Django API and static files will be served from [`localhost:8000`](http://lo
 Proxy config in [`vue.config.js`](/vue.config.js) is used to route the requests
 back to django's API on port 8000.
 
+### Pre-commit hook
+It is installed automatically via `.admin.sh init`, but you can always do it manually:
+
+Inside your **virtual environment** run:
+```
+pre-commit install
+```
+
+**You need to install shellcheck and shfmt on your computer.**
+
+### Format on save in VSCode
+To add this formatters to your visual studio code you need to install eslint, prettier, shellcheck, shell-format (it uses shfmt under the hood) and python as extension (Ctrl + Shift + X in VSCode)
+then in settings (Ctrl + Shift + P -> Open Settings (JSON)), paste:
+
+```
+{
+  "editor.formatOnSave": true,
+  "python.formatting.provider": "black",
+  "[python]": {
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true,
+    },
+  },
+  "python.linting.flake8Enabled": true,  
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "shellformat.flag": "-i 4 -ci",
+}
+```
+
+You will also need both pipenv and node_modules being setup, because linters and formatters are preinstalled in the project and you want your versions to be consistent. Whats more, vscode will use those pre-installed apps; but don't worry `./admin.sh init` does it already for you!
+
 ## Production environment
 
 OrganizeME uses Heroku to run itself on a globally available server. `Procfile` and `app.json` are used to configure Heroku dynos and the startup of an app. The deployment itself, is handled by GitlabCI in the *heroku* job. For more info about CI/CD in the project, please read [CI/CD](#CI-CD).
@@ -57,6 +99,8 @@ OrganizeME uses gitlab as a remote repository provider. Thanks to that, a marvel
   - isort
   - prettier
   - eslint
+  - shfmt
+  - schellcheck
 - deploy
   - heroku
 
@@ -71,7 +115,7 @@ Automate common project maintenance tasks. You should always use it unless you r
 
 *Project initialization*
 
-Sets up containers, create your local pipenv, sets your pythonpath if you use vscode
+Sets up containers, create your local pipenv, sets your pythonpath if you use vscode and install pre-commit hook
 ``` 
 $ ./admin.sh init
 ```

@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "@/components/Home";
-import Messages from "@/components/Messages";
 import UsersDashboard from "@/components/user/UsersDashboard.vue";
 import Login from "@/components/Login.vue";
 import UsersCreation from "@/components/user/UsersCreation.vue";
@@ -23,12 +22,6 @@ const router = new Router({
             name: "login",
             component: Login,
             meta: { requiresAuth: false, requiresNoAuth: true },
-        },
-        {
-            path: "/messages",
-            name: "messages",
-            component: Messages,
-            meta: { requiresAuth: true, requiresNoAuth: false },
         },
         {
             path: "/users",
