@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
     django:
+        image: registry.gitlab.com/jaolejnik/organize-me/django:latest
         build:
             context: .
             dockerfile: docker/django.Dockerfile

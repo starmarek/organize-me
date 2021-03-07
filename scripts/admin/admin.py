@@ -192,13 +192,15 @@ class CLI:
         if self.running_in_vscode:
             _update_virtualenv_vscode_pythonpath()
 
-    def install_pip(self, package, dev):
-        subprocess.run(["pipenv", "install", package, "--dev" if dev else ""], check=True)
+    def install_pip(self, package, dev=False):
+        subprocess.run(shlex.split(f"pipenv install {package} {'--dev' if dev else ''}"), check=True)
 
         self.containers_ground_up(cache=False)
 
-    def install_yarn(self, package, dev):
-        subprocess.run(["sudo", yarn_dir + yarn_executable, "add", package, "--dev" if dev else ""], check=True)
+    def install_yarn(self, package, dev=False):
+        subprocess.run(
+            shlex.split(f"sudo {yarn_dir + yarn_executable} add {package} {'--dev' if dev else ''}"), check=True
+        )
 
         self.containers_ground_up(cache=False)
 

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 
 import dj_database_url
 
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "rest_framework_simplejwt.token_blacklist",
     "whitenoise.runserver_nostatic",  # < Per Whitenoise, to disable built in
     "django.contrib.staticfiles",
     "rest_framework",
@@ -126,12 +128,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, "dist", "static")
 STATICFILES_DIRS = []
 
 
-##########
-# STATIC #
-##########
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Insert Whitenoise Middleware at top but below Security Middleware
-# MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware',)
-# http://whitenoise.evans.io/en/stable/django.html#make-sure-staticfiles-is-configured-correctly
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
+
+if not DEBUG:
+    REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] = ["rest_framework.permissions.IsAuthenticated"]
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(weeks=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(weeks=52 * 100),  # basically infinite time -> more or less 100 years
+}

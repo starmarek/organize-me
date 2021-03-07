@@ -1,23 +1,20 @@
-"""project URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/2.1/topics/http/urls/
-"""
-
 from django.contrib import admin
 from django.urls import include, path
+from django.views.decorators.cache import never_cache
+from django.views.generic import TemplateView
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenRefreshView
 
-from .api.views import MessageViewSet, index_view
+from .api.views.auth_view import CustomTokenObtainPairView, logout_view
 
 router = routers.DefaultRouter()
-router.register("messages", MessageViewSet)
+# router.register("messages", MessageViewSet)
 
 urlpatterns = [
-    # http://localhost:8000/
-    path("", index_view, name="index"),
-    # http://localhost:8000/api/<router-viewsets>
+    path("", never_cache(TemplateView.as_view(template_name="index.html")), name="index"),
     path("api/", include(router.urls)),
-    # http://localhost:8000/api/admin/
     path("admin/", admin.site.urls),
+    path("api/logout/", logout_view, name="logout_view"),
+    path("api/token/", CustomTokenObtainPairView.as_view()),
+    path("api/token/refresh/", TokenRefreshView.as_view()),
 ]

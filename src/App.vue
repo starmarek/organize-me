@@ -1,9 +1,7 @@
 <template>
     <div class="app content">
         <Navbar />
-        <div class="main container">
-            <router-view />
-        </div>
+        <router-view />
     </div>
 </template>
 
@@ -21,10 +19,6 @@ export default {
 // CUSTOM
 body {
     height: 100vh;
-}
-
-.main {
-    padding: 20pt 10pt 20pt 10pt;
 }
 
 // BULMA

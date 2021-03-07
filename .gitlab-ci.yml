@@ -17,17 +17,38 @@ variables:
         PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
         WORKON_HOME: "$CI_PROJECT_DIR/venv"
 
-.python_formatter_linter_jobs_base: &python_formatter_linter_jobs_base
+.python_test_jobs_base: &python_test_jobs_base
     stage: test
     dependencies:
         - install_pipenv
     <<: *pipenv_job
 
-.node_formatter_linter_jobs_base: &node_formatter_linter_jobs_base
+.docker_job_base: &docker_job_base
+    image: docker/compose:latest
+    dependencies: []
+    services:
+        - docker:dind
+    variables:
+        DOCKER_HOST: tcp://docker:2375
+        DOCKER_DRIVER: overlay2
+    before_script:
+        - docker version
+        - docker-compose version
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - cp .template.env .env
+
+.node_test_jobs_base: &node_test_jobs_base
     image: node:$NODE_VERSION
     stage: test
     dependencies:
         - install_node
+
+build_compose:
+    stage: build
+    <<: *docker_job_base
+    script:
+        - docker-compose build --no-cache
+        - docker-compose push
 
 install_pipenv:
     stage: build
@@ -51,32 +72,40 @@ install_node:
         expire_in: 1 day
 
 prettier:
-    <<: *node_formatter_linter_jobs_base
+    <<: *node_test_jobs_base
     script:
         - yarn run check-format
 
 eslint:
-    <<: *node_formatter_linter_jobs_base
+    <<: *node_test_jobs_base
     before_script:
         - yarn run check-eslint-config
     script:
         - yarn run lint
 
 flake8:
-    <<: *python_formatter_linter_jobs_base
+    <<: *python_test_jobs_base
     script:
         - pipenv run flake8
 
 black:
-    <<: *python_formatter_linter_jobs_base
+    <<: *python_test_jobs_base
     script:
         - pipenv run black . --check
 
 isort:
-    <<: *python_formatter_linter_jobs_base
+    <<: *python_test_jobs_base
     script:
         - pipenv run isort . --check
 
+python_UT:
+    stage: test
+    <<: *docker_job_base
+    script:
+        - docker-compose pull
+        - docker-compose up -d
+        - docker-compose ps
+        - docker-compose exec -T django pipenv run python manage.py test
 shellcheck:
     image: koalaman/shellcheck-alpine:stable
     stage: test

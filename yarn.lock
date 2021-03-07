@@ -1987,13 +1987,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.18.0":
-  version: 0.18.1
-  resolution: "axios@npm:0.18.1"
+"axios@npm:^0.21.1":
+  version: 0.21.1
+  resolution: "axios@npm:0.21.1"
   dependencies:
-    follow-redirects: 1.5.10
-    is-buffer: ^2.0.2
-  checksum: 6188a1b815733c1b6118eddc70d931caea7f867ca77ade8205e49cd6e457b837460cc4e325e19c66a81190a170fde5b76480878366b3743131977da76d571bec
+    follow-redirects: ^1.10.0
+  checksum: 864fb7b5d077d236737f10adca53bf451a93f35a15271f56fba8da07265a02d26b7d881b935a6697dc6adb0549ea3e56d2eecb403edaa3bb78f6479901c10f69
   languageName: node
   linkType: hard
 
@@ -2356,14 +2355,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buefy@npm:^0.8.20":
-  version: 0.8.20
-  resolution: "buefy@npm:0.8.20"
+"buefy@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "buefy@npm:0.9.4"
   dependencies:
-    bulma: 0.7.5
+    bulma: 0.9.1
   peerDependencies:
-    vue: ^2.5.18
-  checksum: 9d25a239068deebce8d02b2194f617d3db402bf5f7c9a2c19d6bbb31919bed60ded26082d26b404529e44499b951a97df6e5699d1470907746fc42cf8e29f284
+    vue: ^2.6.11
+  checksum: 7f6b9db47355757c7582049ddfdea08b5956d3fa057ddd18f404be69f9a440954aca77d33fb28fdce8f9b702ca1fd5c17ec6cbb819d6c594e66919ce9e53d0d5
   languageName: node
   linkType: hard
 
@@ -2406,10 +2405,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bulma@npm:0.7.5":
-  version: 0.7.5
-  resolution: "bulma@npm:0.7.5"
-  checksum: 96ab3f6bfc091d6d858de8d747c6460861a6a46082455a898cf912f27bd87e659a98079fd53a6ad7092ac2322d729be988125b6b717109db0f00644cedba0b72
+"bulma@npm:0.9.1":
+  version: 0.9.1
+  resolution: "bulma@npm:0.9.1"
+  checksum: b4bfe969cb711537383aabab724019ab3e5028891382a20dedde85fa8247a0af9ec0f8cdd26e7276528311cda97e77cdf382b2b0f86f1034963273e1fadb9433
   languageName: node
   linkType: hard
 
@@ -3483,15 +3482,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:=3.1.0":
-  version: 3.1.0
-  resolution: "debug@npm:3.1.0"
-  dependencies:
-    ms: 2.0.0
-  checksum: 1295acd5e0531761255661d325cd0a80ac8c5f6de8942a53bb23c2197ccb97526972de662ed0e5d9393be83f3428a298a6e7185ecb02f0da6282019cd2ffb4a8
-  languageName: node
-  linkType: hard
-
 "debug@npm:^3.1.1, debug@npm:^3.2.6":
   version: 3.2.7
   resolution: "debug@npm:3.2.7"
@@ -3706,13 +3696,14 @@ __metadata:
   dependencies:
     "@vue/cli-plugin-babel": ^3.0.0-rc.12
     "@vue/cli-service": ^3.0.0-rc.12
-    axios: ^0.18.0
+    axios: ^0.21.1
     babel-eslint: ^10.1.0
-    buefy: ^0.8.20
+    buefy: ^0.9.4
     eslint: ^7.16.0
     eslint-config-prettier: ^7.1.0
     eslint-plugin-vue: ^7.4.0
     js-cookie: ^2.2.0
+    jwt-decode: ^3.1.2
     node-sass: ^4.14.1
     prettier: ^2.2.1
     sass: ^1.26.10
@@ -4714,16 +4705,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:1.5.10":
-  version: 1.5.10
-  resolution: "follow-redirects@npm:1.5.10"
-  dependencies:
-    debug: =3.1.0
-  checksum: 6e58e02c31337b6b41ffc3d5f3d49920b7db428eddcf374537da00ef121fe473983e12d8557f4304287604168d3efcc288d1f009abaf4c9d61e5db0c0cee3c4a
-  languageName: node
-  linkType: hard
-
-"follow-redirects@npm:^1.0.0":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.10.0":
   version: 1.13.2
   resolution: "follow-redirects@npm:1.13.2"
   peerDependenciesMeta:
@@ -5788,13 +5770,6 @@ fsevents@~2.3.1:
   languageName: node
   linkType: hard
 
-"is-buffer@npm:^2.0.2":
-  version: 2.0.5
-  resolution: "is-buffer@npm:2.0.5"
-  checksum: 1a6dc68206e834887d3b0d8e8ec6c95e0d780314479526a5a2cf458838d1bc441a105c4cebf95d8cc16e383238f66c41761ec622f6154043186e3d9439d56970
-  languageName: node
-  linkType: hard
-
 "is-callable@npm:^1.1.4, is-callable@npm:^1.2.2":
   version: 1.2.3
   resolution: "is-callable@npm:1.2.3"
@@ -6356,6 +6331,13 @@ fsevents@~2.3.1:
     json-schema: 0.2.3
     verror: 1.10.0
   checksum: ee0177b7ef39e6becf18c586d31fabe15d62be88e7867d3aff86466e4a3de9a2cd47b6e597417aebc1cd3c2d43bc662e79ab5eecdadf3ce0643e909432ed6d2c
+  languageName: node
+  linkType: hard
+
+"jwt-decode@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "jwt-decode@npm:3.1.2"
+  checksum: 144712f200e4ad87d8550f614cb40017b1e6f20b6b105b4184ddbd076566e85e13a015ae1af7fc85ace03768eabe5e0863fa79cb6349adea8396f9f729a93213
   languageName: node
   linkType: hard
 
